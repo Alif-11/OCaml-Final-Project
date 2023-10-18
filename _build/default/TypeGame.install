@@ -1,0 +1,30 @@
+lib: [
+  "_build/install/default/lib/TypeGame/META"
+  "_build/install/default/lib/TypeGame/TypeGame.a"
+  "_build/install/default/lib/TypeGame/TypeGame.cma"
+  "_build/install/default/lib/TypeGame/TypeGame.cmxa"
+  "_build/install/default/lib/TypeGame/calcs.ml"
+  "_build/install/default/lib/TypeGame/dune-package"
+  "_build/install/default/lib/TypeGame/opam"
+  "_build/install/default/lib/TypeGame/state.ml"
+  "_build/install/default/lib/TypeGame/typeGame.cmi"
+  "_build/install/default/lib/TypeGame/typeGame.cmt"
+  "_build/install/default/lib/TypeGame/typeGame.cmx"
+  "_build/install/default/lib/TypeGame/typeGame.ml"
+  "_build/install/default/lib/TypeGame/typeGame__Calcs.cmi"
+  "_build/install/default/lib/TypeGame/typeGame__Calcs.cmt"
+  "_build/install/default/lib/TypeGame/typeGame__Calcs.cmx"
+  "_build/install/default/lib/TypeGame/typeGame__State.cmi"
+  "_build/install/default/lib/TypeGame/typeGame__State.cmt"
+  "_build/install/default/lib/TypeGame/typeGame__State.cmx"
+  "_build/install/default/lib/TypeGame/typeGame__Ui.cmi"
+  "_build/install/default/lib/TypeGame/typeGame__Ui.cmt"
+  "_build/install/default/lib/TypeGame/typeGame__Ui.cmx"
+  "_build/install/default/lib/TypeGame/ui.ml"
+]
+libexec: [
+  "_build/install/default/lib/TypeGame/TypeGame.cmxs"
+]
+doc: [
+  "_build/install/default/doc/TypeGame/README.md"
+]

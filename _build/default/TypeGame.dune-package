@@ -1,0 +1,61 @@
+(lang dune 3.10)
+(name TypeGame)
+(sections (lib .) (libexec .) (doc ../../doc/TypeGame))
+(files
+ (lib
+  (META
+   TypeGame.a
+   TypeGame.cma
+   TypeGame.cmxa
+   calcs.ml
+   dune-package
+   opam
+   state.ml
+   typeGame.cmi
+   typeGame.cmt
+   typeGame.cmx
+   typeGame.ml
+   typeGame__Calcs.cmi
+   typeGame__Calcs.cmt
+   typeGame__Calcs.cmx
+   typeGame__State.cmi
+   typeGame__State.cmt
+   typeGame__State.cmx
+   typeGame__Ui.cmi
+   typeGame__Ui.cmt
+   typeGame__Ui.cmx
+   ui.ml))
+ (libexec (TypeGame.cmxs))
+ (doc (README.md)))
+(library
+ (name TypeGame)
+ (kind normal)
+ (archives (byte TypeGame.cma) (native TypeGame.cmxa))
+ (plugins (byte TypeGame.cma) (native TypeGame.cmxs))
+ (native_archives TypeGame.a)
+ (requires str graphics)
+ (main_module_name TypeGame)
+ (modes byte native)
+ (modules
+  (wrapped
+   (group
+    (alias
+     (obj_name typeGame)
+     (visibility public)
+     (kind alias)
+     (source (path TypeGame) (impl (path typeGame.ml-gen))))
+    (name TypeGame)
+    (modules
+     (module
+      (obj_name typeGame__Calcs)
+      (visibility public)
+      (source (path Calcs) (impl (path calcs.ml))))
+     (module
+      (obj_name typeGame__State)
+      (visibility public)
+      (source (path State) (impl (path state.ml))))
+     (module
+      (obj_name typeGame__Ui)
+      (visibility public)
+      (source (path Ui) (impl (path ui.ml))))))
+   (wrapped true))))

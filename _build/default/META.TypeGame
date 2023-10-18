@@ -1,0 +1,6 @@
+description = ""
+requires = "graphics str"
+archive(byte) = "TypeGame.cma"
+archive(native) = "TypeGame.cmxa"
+plugin(byte) = "TypeGame.cma"
+plugin(native) = "TypeGame.cmxs"
