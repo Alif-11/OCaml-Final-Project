@@ -8,23 +8,29 @@
    TypeGame.cma
    TypeGame.cmxa
    calcs.ml
+   calcs.mli
    dune-package
    opam
    state.ml
+   state.mli
    typeGame.cmi
    typeGame.cmt
    typeGame.cmx
    typeGame.ml
    typeGame__Calcs.cmi
    typeGame__Calcs.cmt
+   typeGame__Calcs.cmti
    typeGame__Calcs.cmx
    typeGame__State.cmi
    typeGame__State.cmt
+   typeGame__State.cmti
    typeGame__State.cmx
    typeGame__Ui.cmi
    typeGame__Ui.cmt
+   typeGame__Ui.cmti
    typeGame__Ui.cmx
-   ui.ml))
+   ui.ml
+   ui.mli))
  (libexec (TypeGame.cmxs))
  (doc (README.md)))
 (library
@@ -33,7 +39,7 @@
  (archives (byte TypeGame.cma) (native TypeGame.cmxa))
  (plugins (byte TypeGame.cma) (native TypeGame.cmxs))
  (native_archives TypeGame.a)
- (requires str graphics)
+ (requires str graphics unix lwt)
  (main_module_name TypeGame)
  (modes byte native)
  (modules
@@ -49,13 +55,13 @@
      (module
       (obj_name typeGame__Calcs)
       (visibility public)
-      (source (path Calcs) (impl (path calcs.ml))))
+      (source (path Calcs) (intf (path calcs.mli)) (impl (path calcs.ml))))
      (module
       (obj_name typeGame__State)
       (visibility public)
-      (source (path State) (impl (path state.ml))))
+      (source (path State) (intf (path state.mli)) (impl (path state.ml))))
      (module
       (obj_name typeGame__Ui)
       (visibility public)
-      (source (path Ui) (impl (path ui.ml))))))
+      (source (path Ui) (intf (path ui.mli)) (impl (path ui.ml))))))
    (wrapped true))))

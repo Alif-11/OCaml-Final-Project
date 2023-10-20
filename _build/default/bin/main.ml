@@ -1,0 +1,2 @@
+open TypeGame
+open Graphics
