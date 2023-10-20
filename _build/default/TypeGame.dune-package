@@ -10,6 +10,8 @@
    calcs.ml
    calcs.mli
    dune-package
+   game.ml
+   game.mli
    opam
    state.ml
    state.mli
@@ -21,6 +23,10 @@
    typeGame__Calcs.cmt
    typeGame__Calcs.cmti
    typeGame__Calcs.cmx
+   typeGame__Game.cmi
+   typeGame__Game.cmt
+   typeGame__Game.cmti
+   typeGame__Game.cmx
    typeGame__State.cmi
    typeGame__State.cmt
    typeGame__State.cmti
@@ -56,6 +62,10 @@
       (obj_name typeGame__Calcs)
       (visibility public)
       (source (path Calcs) (intf (path calcs.mli)) (impl (path calcs.ml))))
+     (module
+      (obj_name typeGame__Game)
+      (visibility public)
+      (source (path Game) (intf (path game.mli)) (impl (path game.ml))))
      (module
       (obj_name typeGame__State)
       (visibility public)

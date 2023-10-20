@@ -1,13 +1,3 @@
-open Graphics
-open Unix
-open Lwt
-
-module type UiType = sig
-  type t
-  
-  val start : unit -> string -> unit
-  val draw_timer : unit -> unit
-end
 
 let timer = 
     let start_time = Unix.gettimeofday () in
@@ -18,13 +8,7 @@ let timer =
     let min = time_passed / 600 in
     string_of_int min ^ ":" ^ 
     string_of_int sec ^ "." ^ string_of_int hundredths_sec
+let draw_timer () = 
+  let time = timer () in
+  Graphics.draw_string time
     
-module Ui : UiType = struct
-  type t
-  
-  let start () = Graphics.open_graph
-
-  let draw_timer () = 
-    let time = timer () in
-    Graphics.draw_string time
-end
