@@ -1,0 +1,1 @@
+let data = In_channel.open_text "data/1-1000.txt" |> In_channel.input_all
