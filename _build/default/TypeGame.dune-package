@@ -1,4 +1,4 @@
-(lang dune 3.10)
+(lang dune 3.11)
 (name TypeGame)
 (sections (lib .) (libexec .) (doc ../../doc/TypeGame))
 (files
@@ -35,8 +35,12 @@
    typeGame__Ui.cmt
    typeGame__Ui.cmti
    typeGame__Ui.cmx
+   typeGame__Words.cmi
+   typeGame__Words.cmt
+   typeGame__Words.cmx
    ui.ml
-   ui.mli))
+   ui.mli
+   words.ml))
  (libexec (TypeGame.cmxs))
  (doc (README.md)))
 (library
@@ -73,5 +77,9 @@
      (module
       (obj_name typeGame__Ui)
       (visibility public)
-      (source (path Ui) (intf (path ui.mli)) (impl (path ui.ml))))))
+      (source (path Ui) (intf (path ui.mli)) (impl (path ui.ml))))
+     (module
+      (obj_name typeGame__Words)
+      (visibility public)
+      (source (path Words) (impl (path words.ml))))))
    (wrapped true))))
