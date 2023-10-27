@@ -11,9 +11,9 @@ let round_tick start_time cursorX cursorY=
   let min = time_passed / 6000 in
   let time_string = string_of_int min ^ ":" ^ string_sec ^ "." ^ string_frac_sec in
   print_endline time_string;
-  Graphics.moveto 0 1375;
+  Graphics.moveto 0 900;
   Graphics.set_color Graphics.white;
-  Graphics.fill_rect 0 1375 100 30;
+  Graphics.fill_rect 0 900 100 30;
   Graphics.set_color Graphics.black;
   Graphics.draw_string time_string;
   match Graphics.key_pressed () with
@@ -27,7 +27,7 @@ let round_tick start_time cursorX cursorY=
 let round ()= 
   let start_time = Unix.gettimeofday () in
   let cursorX = ref 0 in
-  let cursorY = ref 1000 in
+  let cursorY = ref 500 in
   while true do
     Unix.sleepf 0.001;
     match cursorX with | {contents = integer} -> let xpos = integer in 
@@ -38,5 +38,5 @@ let round ()=
   done
 
 let () = 
-  Graphics.open_graph " 1500x1500+0+0";
+  Graphics.open_graph " 1000x1000+0+0";
   round ();
