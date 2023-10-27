@@ -1,1 +1,0 @@
-val draw_timer : unit -> unit

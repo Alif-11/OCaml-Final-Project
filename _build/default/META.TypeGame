@@ -1,6 +1,0 @@
-description = ""
-requires = "graphics lwt str unix"
-archive(byte) = "TypeGame.cma"
-archive(native) = "TypeGame.cmxa"
-plugin(byte) = "TypeGame.cma"
-plugin(native) = "TypeGame.cmxs"
