@@ -68,7 +68,7 @@ let round ()=
     match str with | {contents = string} -> let curStr = string in
     match score with | {contents = integer} -> let curScore = integer in
     match fin with | {contents = boolean} -> let isFin = boolean in
-    let bruh = round_tick start_time 3000 {pos = (xpos, ypos); str = curStr; score = curScore; fin = isFin} in
+    let bruh = round_tick start_time 6000 {pos = (xpos, ypos); str = curStr; score = curScore; fin = isFin} in
     cursorX := fst bruh.pos;
     cursorY := snd bruh.pos;
     str := bruh.str;

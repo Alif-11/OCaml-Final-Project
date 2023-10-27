@@ -1,4 +1,7 @@
 (** The signature of sampleable bags (multisets). *)
+
+Random.self_init ()
+
 module type SampleBagType = sig
   type t
 
