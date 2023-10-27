@@ -1,1 +1,1 @@
-src/game.ml: In_channel List Str String
+src/game.ml: In_channel List Random Str String

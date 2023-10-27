@@ -11,6 +11,3 @@ module State = TypeGame__State
 
 (** @canonical TypeGame.Ui *)
 module Ui = TypeGame__Ui
-
-(** @canonical TypeGame.Words *)
-module Words = TypeGame__Words

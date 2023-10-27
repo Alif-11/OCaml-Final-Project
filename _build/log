@@ -1,9 +1,9 @@
-# dune exec test/main.exec
+# dune exec bin/main.exe
 # OCAMLPARAM: unset
 # Shared cache: disabled
 # Workspace root: /home/amymai/cs3110/cs3110-final
 # Auto-detected concurrency: 16
-$ /home/amymai/.opam/cs3110-2023fa/bin/ocamlc.opt -config > /tmp/dune_e87350_output
+$ /home/amymai/.opam/cs3110-2023fa/bin/ocamlc.opt -config > /tmp/dune_bd99cc_output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
@@ -103,3 +103,21 @@ $ /home/amymai/.opam/cs3110-2023fa/bin/ocamlc.opt -config > /tmp/dune_e87350_out
 #      }
 #  ; instrument_with = []
 #  }
+$ (cd _build/default && /home/amymai/.opam/cs3110-2023fa/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I src/.TypeGame.objs/byte -I src/.TypeGame.objs/native -I /home/amymai/.opam/cs3110-2023fa/lib/graphics -I /home/amymai/.opam/cs3110-2023fa/lib/lwt -I /home/amymai/.opam/cs3110-2023fa/lib/ocaml/str -I /home/amymai/.opam/cs3110-2023fa/lib/ocaml/unix -intf-suffix .ml -no-alias-deps -opaque -open TypeGame -o src/.TypeGame.objs/native/typeGame__Game.cmx -c -impl src/game.ml)
+> File "src/game.ml", line 6, characters 10-17:
+> 6 |       let to_list (b : t) : t = b
+>               ^^^^^^^
+> Error (warning 32 [unused-value-declaration]): unused value to_list.
+> File "src/game.ml", line 8, characters 10-14:
+> 8 |       let join (b1 : t) (b2 : t) : t = List.append b1 b2
+>               ^^^^
+> Error (warning 32 [unused-value-declaration]): unused value join.
+> File "src/game.ml", line 31, characters 4-12:
+> 31 | let word_bag = WordBag.of_list data
+>          ^^^^^^^^
+> Error (warning 32 [unused-value-declaration]): unused value word_bag.
+> File "src/game.ml", line 34, characters 8-25:
+> 34 | let rec generate_sequence (words : WordBag.t) (n : int) : string list =
+>              ^^^^^^^^^^^^^^^^^
+> Error (warning 32 [unused-value-declaration]): unused value generate_sequence.
+[2]
