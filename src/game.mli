@@ -1,7 +1,6 @@
 (** The signature of sampleable bags (multisets). *)
 module type SampleBagType = sig
     type t
-    (** Type representing the data in the bag. *)
   
     val to_list : t -> string list
     (** Convert a sampleable bag to a list of items. *)
@@ -34,6 +33,9 @@ val data : string list
 
 val word_bag : WordBag.t
 (** The WordBag representation of data *)
+
+val word_bag_t : int -> WordBag.t
+(** The [word_bag_t i] Creates a WordBag of words up to [i] * 50 *)
 
 val generate_sequence : WordBag.t -> int -> string list
 (** Generates a random sequence of length n from words in the WordBag *)

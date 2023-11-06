@@ -46,6 +46,14 @@ let data = data_loader "data/1-1000.txt"
 (** The WordBag representation of data *)
 let word_bag = WordBag.of_list data
 
+let word_bag_t n = 
+  let rec helper n lst = 
+    if n = 0 then []
+    else match lst with
+    |[] -> []
+    |h :: t -> h :: helper (n - 1) t in
+  WordBag.of_list (helper (n * 50) data)
+
 (** Generates a random sequence of length n from words in the WordBag *)
 let rec generate_sequence (words : WordBag.t) (n : int) : string list =
   if n > 0 then

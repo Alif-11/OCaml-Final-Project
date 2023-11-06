@@ -31,14 +31,13 @@ let round_tick start_time time_allotted (state : round_state) =
     let x_pos = fst state.pos in
     let y_pos = snd state.pos in
     let curStr = state.str in
-    let curScore = state.score in
     match Graphics.key_pressed () with
     |true ->  
       Graphics.moveto x_pos y_pos;
       let key = Graphics.read_key () in
       Graphics.draw_char key;
       if key = ' ' then new_line (Graphics.current_point ());
-      if key = ' ' then {state with pos = Graphics.current_point (); str = " "; score = curScore}
+      if key = Char.chr 13 then {state with fin = true}
       else 
         {state with pos = Graphics.current_point (); 
         str = curStr ^ String.make 1 key} 
@@ -46,9 +45,11 @@ let round_tick start_time time_allotted (state : round_state) =
 
   
 
-let round ()= 
+let round gs = 
   Graphics.moveto 100 800;
-  let word_list = Game.generate_sequence Game.word_bag 50 in
+  let word_list = Game.generate_sequence 
+    (Game.word_bag_t (State.NormalGame.difficulty gs))
+    (State.NormalGame.num_words gs) in
   let rec print_words = function
   |[] -> ();
   |h :: t -> Graphics.draw_string (h ^ " ");
@@ -63,19 +64,45 @@ let round ()=
   let fin = ref false in
   while fin = ref false do
     Unix.sleepf 0.001;
-    match cursorX with | {contents = integer} -> let xpos = integer in 
-    match cursorY with | {contents = integer} -> let ypos = integer in
-    match str with | {contents = string} -> let curStr = string in
-    match score with | {contents = integer} -> let curScore = integer in
-    match fin with | {contents = boolean} -> let isFin = boolean in
-    let bruh = round_tick start_time 6000 {pos = (xpos, ypos); str = curStr; score = curScore; fin = isFin} in
-    cursorX := fst bruh.pos;
-    cursorY := snd bruh.pos;
-    str := bruh.str;
-    score := bruh.score;
-    fin := bruh.fin
+    let graphics_state = round_tick start_time 6000 {pos = (!cursorX, !cursorY); str = !str; score = !score; fin = !fin} in
+    cursorX := fst graphics_state.pos;
+    cursorY := snd graphics_state.pos;
+    str := graphics_state.str;
+    score := graphics_state.score;
+    fin := graphics_state.fin
   done
+
 
 let () = 
   Graphics.open_graph " 1000x1000+0+0";
-  round ();
+  Graphics.moveto 100 800;
+  Graphics.set_color Graphics.black;
+  Graphics.draw_string "Rules : ";
+  Graphics.moveto 100 775; 
+  Graphics.draw_string "1. You lose health for getting words wrong";
+  Graphics.draw_string "2. Once you press space, we consider that a new word! You can't go back to fix your mistakes :)";
+  Graphics.moveto 100 750;
+  Graphics.draw_string "3. If you don't finish, then any words left over will also cost you some health :)";
+  Graphics.moveto 100 725;
+  Graphics.draw_string "4. If you have time left over, you can regain some health";
+  Graphics.moveto 100 700;
+  Graphics.draw_string "<PRESS ANY KEY TO CONTINUE>";
+  ignore (Graphics.wait_next_event [Key_pressed]);
+  Graphics.set_color Graphics.white;
+  Graphics.fill_rect 0 0 1000 1000;
+  let gs = State.NormalGame.initialize in
+  while true do
+    Graphics.moveto 100 800;
+    Graphics.set_color Graphics.black;
+    Graphics.draw_string "Are you ready? <PRESS ANY KEY TO START ROUND>";
+    ignore (Graphics.wait_next_event [Key_pressed]);
+    Graphics.set_color Graphics.white;
+    Graphics.fill_rect 0 0 1000 1000;
+    Graphics.set_color Graphics.black;
+    round gs;
+    Graphics.moveto 100 100;
+    Graphics.draw_string "<PRESS ANY KEY TO CONTINUE>";
+    ignore (Graphics.wait_next_event [Key_pressed]);
+    Graphics.set_color Graphics.white;
+    Graphics.fill_rect 0 0 1000 1000;
+  done
