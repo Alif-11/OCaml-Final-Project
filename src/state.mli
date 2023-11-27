@@ -5,15 +5,15 @@ module type GameStateMutable = sig
     unit
   (** Set starting state values *)
 
+  val time : unit -> int
+  (** Time allotted for round in seconds *)
+
   val _time : int ref
   val _num_words : int ref
   val _difficulty : int ref
   val _health : int ref
   val _max_health : int ref
   val _cur_level : int ref
-
-  val time : unit -> int
-  (** Time allotted for round in seconds *)
 
   val num_words : unit -> int
   (** Number of words to be generated *)

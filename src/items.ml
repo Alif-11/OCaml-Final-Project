@@ -1,78 +1,106 @@
 open State
 
-(* Signature detailing basic properties of any item. *)
-module type Items = sig
-  (* How likely said item is to be dropped. Its value can range from 1 (1% drop
-     rate) to 100 (100% drop rate). *)
-  val drop_chance : int
+type name =
+  | Apple
+  | Banana
+  | BrokenClock
+  | EdibleClock
+  | Chaos
 
-  (* Name of the item. *)
-  val item_name : string
+type rarity =
+  | Common
+  | Rare
+  | Epic
+  | Undiscovered
 
-  (* Description of the item's effects. Used to insert comedic text. *)
-  val item_description : string
+type item = name * rarity * string * string * (unit -> unit)
 
-  (* Modified NormalGameMutable in state.ml to cause effects to occur. *)
-  val effects : unit -> unit
+let apple_effect () =
+  let hp = NormalGameMutable._health in
+  hp := !hp + 5
+
+let apple : item =
+  (Apple, Common, "Banapple", "Tastes like a banana.", apple_effect)
+
+let banana_effect () =
+  let hp = NormalGameMutable._health in
+  hp := !hp + 5
+
+let banana : item =
+  (Banana, Common, "Appanana", "Tastes like an apple.", banana_effect)
+
+let broken_clock_effect () =
+  let time = NormalGameMutable._time in
+  time := !time + 10
+
+let broken_clock : item =
+  ( BrokenClock,
+    Rare,
+    "A Broken Clock",
+    "It's right twice a day, even though it's ten seconds off.",
+    broken_clock_effect )
+
+let edible_clock_effect () =
+  let hp = NormalGameMutable._health in
+  let time = NormalGameMutable._time in
+  hp := !hp + 10;
+  time := !time + 15
+
+let edible_clock : item =
+  ( EdibleClock,
+    Epic,
+    "Let Them Eat Clock",
+    "It ... kinda looks like cake??",
+    edible_clock_effect )
+
+let chaos_effect () =
+  let hp = NormalGameMutable._health in
+  let time = NormalGameMutable._time in
+  if Random.int 2 = 0 then (
+    hp := 0;
+    time := 0)
+  else (
+    hp := 250;
+    time := 90)
+
+let chaos : item = (Chaos, Undiscovered, "???", "Don't.", chaos_effect)
+
+module type ItemBag = sig
+  type items
+
+  val obtain_item : unit -> item
 end
 
-module Apple : Items = struct
-  let drop_chance = 30
-  let item_name = "Apple"
-  let item_description = "Tastes like a banana."
+module ArrayItemBag : ItemBag = struct
+  type items = {
+    common : item array;
+    rare : item array;
+    epic : item array;
+    undiscovered : item array;
+  }
 
-  let effects () =
-    let hp = NormalGameMutable._health in
-    hp := !hp + 5
-end
+  let itemlist =
+    {
+      common = [| apple; banana |];
+      rare = [| broken_clock |];
+      epic = [| edible_clock |];
+      undiscovered = [| chaos |];
+    }
 
-module Banana : Items = struct
-  let drop_chance = 30
-  let item_name = "Banana"
-  let item_description = "Tastes like an apple."
-
-  let effects () =
-    let hp = NormalGameMutable._health in
-    hp := !hp + 5
-end
-
-module BrokenClock : Items = struct
-  let drop_chance = 10
-  let item_name = "Broken Clock"
-  let item_description = "A broken clock is usually 10 seconds off."
-
-  let effects () =
-    let time = NormalGameMutable._time in
-    time := !time + 10
-end
-
-module EdibleClock : Items = struct
-  let drop_chance = 5
-  let item_name = "Let Them Eat Clock"
-
-  let item_description =
-    "It should tell the time ... but the clock arms never move, and they sure \
-     do look tasty..."
-
-  let effects () =
-    let hp = NormalGameMutable._health in
-    let time = NormalGameMutable._time in
-    hp := !hp + 10;
-    time := !time + 15
-end
-
-module Chaos : Items = struct
-  let drop_chance = 1
-  let item_name = "???"
-  let item_description = "Don't."
-
-  let effects () =
-    let hp = NormalGameMutable._health in
-    let time = NormalGameMutable._time in
-    if Random.int 2 = 0 then (
-      hp := 0;
-      time := 0)
-    else (
-      hp := 250;
-      time := 90)
+  let obtain_item () =
+    Random.self_init ();
+    let i = itemlist in
+    let chosen_number = Random.int 100 in
+    if chosen_number < 50 then
+      let lst = i.common in
+      Array.get lst (Random.int (Array.length lst))
+    else if chosen_number < 80 then
+      let lst = i.rare in
+      Array.get lst (Random.int (Array.length lst))
+    else if chosen_number < 95 then
+      let lst = i.epic in
+      Array.get lst (Random.int (Array.length lst))
+    else
+      let lst = i.undiscovered in
+      Array.get lst (Random.int (Array.length lst))
 end
