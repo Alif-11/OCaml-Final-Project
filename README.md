@@ -6,7 +6,7 @@ Liesel Wong, lyw8 <br>
 
 
 
-# TO RUN
+# to run the code
 Download: 
 ``` 
 dune build
