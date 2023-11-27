@@ -51,7 +51,7 @@ module NormalGame : GameState = struct
   let cur_level gs = gs.hp
 
   let health_lost time_left missed words_left gs = 
-    let damage_taken = time_left - missed - words_left in
+    let damage_taken = time_left - missed * 5 - words_left * 5 in
     {gs with hp = min (gs.hp + damage_taken) (gs.max_hp)}
 
   let adjust_level gs = {gs with cur_lvl = gs.cur_lvl + 1; num_words = gs.num_words + 10}
