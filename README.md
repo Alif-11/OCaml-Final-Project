@@ -8,7 +8,12 @@ Liesel Wong, lyw8 <br>
 
 # TO RUN
 Download: 
-
+``` 
+dune build
+```
+``` 
+opam install graphics
+```
 
 Run: 
 ``` 
