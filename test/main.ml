@@ -1,5 +1,5 @@
 open OUnit2
-open TypeGame
+
 module WB = TypeGame.Game.WordBag
 
 (** [cmp_bag_like_lists lst1 lst2] compares two lists to see whether they are
@@ -71,5 +71,5 @@ let join_tests =
 
 let word_bag_tests = to_list_tests @ of_list_tests @ join_tests
 
-let tests = "test suite" >::: []
-let _ = run_test_tt_main tests
+let tests = "test suite" >::: word_bag_tests
+let () = run_test_tt_main tests
