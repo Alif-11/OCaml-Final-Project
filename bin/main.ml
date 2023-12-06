@@ -8,10 +8,8 @@ type round_state = {
   mutable right : int;
   mutable wrong : int;
   mutable words : string list;
+  mutable differences : (string * string) list;
 }
-
-let time_passed start_time cur_time =
-  int_of_float (Float.round ((cur_time -. start_time) *. 100.0))
 
 (*for keeping spacing relatively consistent*)
 let new_line = function
@@ -20,7 +18,9 @@ let new_line = function
 (*things happening at each tick of a round*)
 let round_tick start_time time_allotted (state : round_state) =
   let cur_time = Unix.gettimeofday () in
-  let time_passed = time_passed start_time cur_time in
+  let time_passed =
+    int_of_float (Float.round ((cur_time -. start_time) *. 100.0))
+  in
   let frac_sec = time_passed mod 100 in
   let string_frac_sec =
     if frac_sec < 10 then "0" ^ string_of_int frac_sec
@@ -58,32 +58,34 @@ let round_tick start_time time_allotted (state : round_state) =
               pos = (x_pos - 6, y_pos);
               str = String.sub state.str 0 (String.length state.str - 1);
             })
-        else (
+        else if key = ' ' || key = Char.chr 13 then (
           Graphics.draw_char key;
-          if key = ' ' || key = Char.chr 13 then (
-            state.typed <- state.typed + 1;
-            (match state.words with
-            | [] -> state.wrong <- state.wrong + 1
-            | h :: t ->
-                if h = state.str then (
-                  state.right <- state.right + 1;
-                  state.words <- t)
-                else (
-                  state.wrong <- state.wrong + 1;
-                  Graphics.set_color Graphics.red;
-                  Graphics.fill_rect x_pos y_pos 6 13;
-                  Graphics.set_color Graphics.white;
-                  state.words <- t));
-            state.str <- "";
-            new_line (x_pos, y_pos);
-            if key = ' ' then { state with pos = Graphics.current_point () }
-            else { state with fin = true })
-          else
-            {
-              state with
-              pos = Graphics.current_point ();
-              str = state.str ^ String.make 1 key;
-            })
+          state.typed <- state.typed + 1;
+          (match state.words with
+          | [] -> state.wrong <- state.wrong + 1
+          | h :: t ->
+              if h = state.str then (
+                state.right <- state.right + 1;
+                state.words <- t)
+              else (
+                state.wrong <- state.wrong + 1;
+                Graphics.set_color Graphics.red;
+                Graphics.fill_rect x_pos y_pos 6 13;
+                Graphics.set_color Graphics.white;
+                state.words <- t;
+                state.differences <- (h, state.str) :: state.differences));
+          state.str <- "";
+          new_line (x_pos, y_pos);
+          if key = ' ' then { state with pos = Graphics.current_point () }
+          else { state with fin = true })
+        else if Char.code key >= 97 && Char.code key <= 122 then (
+          Graphics.draw_char key;
+          {
+            state with
+            pos = Graphics.current_point ();
+            str = state.str ^ String.make 1 key;
+          })
+        else state
     | false -> state
 
 let round gs =
@@ -148,6 +150,7 @@ let round gs =
         right = 0;
         wrong = 0;
         words = word_list;
+        differences = [ ("", "") ];
       }
   in
   while !finished = false do
@@ -155,7 +158,8 @@ let round gs =
     rs_tick := round_tick start_time 6000 !rs_tick;
     finished := !rs_tick.fin
   done;
-  let time_passed = time_passed start_time (Unix.gettimeofday ()) / 100 in
+  let cur_time = Unix.gettimeofday () in
+  let time_passed = int_of_float (Float.round (cur_time -. start_time)) in
   let time_given = State.NormalGameMutable.time () in
   Unix.sleepf 1.0;
   Graphics.set_color Graphics.white;
@@ -197,6 +201,28 @@ let round gs =
   Graphics.draw_string
     ("You are now at " ^ string_of_int cur_health ^ " health!");
   Graphics.moveto 100 725;
+  Graphics.draw_string "Here's what you got wrong: ";
+  Graphics.moveto 100 700;
+  let rec diffs_to_strings (diffs : (string * string) list) (acc : string list)
+      =
+    match diffs with
+    | [] -> acc
+    | h :: t -> (
+        match h with
+        | original, given ->
+            let stringified = "|" ^ original ^ "-" ^ given ^ "|" in
+            diffs_to_strings t (stringified :: acc))
+  in
+  let stringed_diffs = diffs_to_strings (List.tl !rs_tick.differences) [] in
+  print_words stringed_diffs;
+  let pos = Graphics.current_point () in
+  new_line (1000, snd pos);
+  Graphics.draw_string "Here's what you didn't get around to:";
+  let pos = Graphics.current_point () in
+  new_line (1000, snd pos);
+  print_words !rs_tick.words;
+  let pos = Graphics.current_point () in
+  new_line (1000, snd pos);
   if cur_health > 0 then
     ( true,
       Graphics.draw_string
