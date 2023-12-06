@@ -1,25 +1,25 @@
 (** The signature of sampleable bags (multisets). *)
 module type SampleBagType = sig
-    type t
-  
-    val to_list : t -> string list
-    (** Convert a sampleable bag to a list of items. *)
-  
-    val of_list : string list -> t
-    (** Convert a list of items into a sampleable bag. *)
-  
-    val join : t -> t -> t
-    (** Combine two sampleable bags. The multiplicity of an item in the output bag
-        is the sum of the multiplicities of the item in the two input bags. *)
-  
-    val sample : t -> string option
-    (** Draw an item from the sampleable bag. Return [None] if the bag is empty. *)
-  end
-  
-  module WordBag : SampleBagType
-  (** Sampleable bag such that sample returns elements with probability
-      proportional to their multiplicity. *)
-  
+  type t
+
+  val to_list : t -> string list
+  (** Convert a sampleable bag to a list of items. *)
+
+  val of_list : string list -> t
+  (** Convert a list of items into a sampleable bag. *)
+
+  val join : t -> t -> t
+  (** Combine two sampleable bags. The multiplicity of an item in the output bag
+      is the sum of the multiplicities of the item in the two input bags. *)
+
+  val sample : t -> string option
+  (** Draw an item from the sampleable bag. Return [None] if the bag is empty. *)
+end
+
+module WordBag : SampleBagType
+(** Sampleable bag such that sample returns elements with probability
+    proportional to their multiplicity. *)
+
 val sanitize : string -> string list
 (** LIFTED <sanitize (s: string) : string list> FROM A2: ngrams.ml, line 69
     Sanitize a string by removing non-alphanumeric symbols. Return the list of

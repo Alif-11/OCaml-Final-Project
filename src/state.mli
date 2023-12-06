@@ -14,6 +14,7 @@ module type GameStateMutable = sig
   val _health : int ref
   val _max_health : int ref
   val _cur_level : int ref
+  val _score : int ref
 
   val num_words : unit -> int
   (** Number of words to be generated *)
@@ -30,36 +31,17 @@ module type GameStateMutable = sig
   val cur_level : unit -> int
   (** Number of rounds player has passed so far *)
 
+  val score : unit -> int
+
   val health_lost : int -> int -> int -> unit
-  (** Calculates health lost given time remaining, accuracy, words remaining *)
+  (** Calculates health lost given time remaining, words wrong and words
+      remaining *)
 
   val adjust_level : unit -> unit
   (** Adjust level depending on number of rounds *)
+
+  val add_score : int -> unit
+  (** add score based on number of correct words as passed in*)
 end
 
 module NormalGameMutable : GameStateMutable
-
-(* (** The signature of Game State*) module type GameState = sig type t (**
-   Representation type of Game State *)
-
-   val initialize : t (** Create an initial game state*)
-
-   val time : t -> int (** Time allotted for round in seconds *)
-
-   val num_words : t -> int (** Number of words to be generated *)
-
-   val difficulty : t -> int (** Difficulty level of words generated *)
-
-   val health : t -> int (** Current health *)
-
-   val max_health : t -> int (** Current max health*)
-
-   val cur_level : t -> int (** Number of rounds player has passed so far *)
-
-   val health_lost : int -> int -> int -> t -> t (** Calculates health lost
-   given time remaining, accuracy, words remaining *)
-
-   val adjust_level : t -> t (** Adjust level depending on number of rounds and
-   *) end
-
-   module NormalGame : GameState *)
