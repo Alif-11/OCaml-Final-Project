@@ -223,13 +223,15 @@ let round gs =
   print_words !rs_tick.words;
   let pos = Graphics.current_point () in
   new_line (1000, snd pos);
-  if cur_health > 0 then
-    ( true,
-      Graphics.draw_string
-        ("Your current score is "
-        ^ string_of_int !State.NormalGameMutable._score
-        ^ ".") )
-  else (false, Graphics.draw_string "You died! Better luck next time.")
+  if cur_health > 0 then (
+    Graphics.draw_string
+      ("Your current score is "
+      ^ string_of_int !State.NormalGameMutable._score
+      ^ ".");
+    true)
+  else (
+    Graphics.draw_string "You died! Better luck next time.";
+    false)
 
 let () =
   (*Game initialization*)
@@ -260,7 +262,7 @@ let () =
   let playing = ref true in
   (*Game loop*)
   while !playing do
-    playing := fst (round !gs);
+    playing := round !gs;
     Graphics.moveto 100 100;
     Graphics.draw_string "<PRESS ANY KEY TO CONTINUE>";
     ignore (Graphics.wait_next_event [ Key_pressed ]);
