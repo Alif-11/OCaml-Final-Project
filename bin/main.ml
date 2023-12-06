@@ -47,25 +47,43 @@ let round_tick start_time time_allotted (state : round_state) =
     | true ->
         Graphics.moveto x_pos y_pos;
         let key = Graphics.read_key () in
-        Graphics.draw_char key;
-        if key = ' ' || key = Char.chr 13 then (
-          new_line (Graphics.current_point ());
-          state.typed <- state.typed + 1;
-          (match state.words with
-          | [] -> state.wrong <- state.wrong + 1
-          | h :: t ->
-              if h = state.str then state.right <- state.right + 1
-              else state.wrong <- state.wrong + 1;
-              state.words <- t);
-          state.str <- "";
-          if key = ' ' then { state with pos = Graphics.current_point () }
-          else { state with fin = true })
-        else
-          {
-            state with
-            pos = Graphics.current_point ();
-            str = state.str ^ String.make 1 key;
-          }
+        if key = Char.chr 8 then
+          if String.length state.str = 0 then state
+          else (
+            Graphics.set_color Graphics.white;
+            Graphics.fill_rect (x_pos - 6) y_pos 6 13;
+            Graphics.moveto (x_pos - 6) y_pos;
+            {
+              state with
+              pos = (x_pos - 6, y_pos);
+              str = String.sub state.str 0 (String.length state.str - 1);
+            })
+        else (
+          Graphics.draw_char key;
+          if key = ' ' || key = Char.chr 13 then (
+            state.typed <- state.typed + 1;
+            (match state.words with
+            | [] -> state.wrong <- state.wrong + 1
+            | h :: t ->
+                if h = state.str then (
+                  state.right <- state.right + 1;
+                  state.words <- t)
+                else (
+                  state.wrong <- state.wrong + 1;
+                  Graphics.set_color Graphics.red;
+                  Graphics.fill_rect x_pos y_pos 6 13;
+                  Graphics.set_color Graphics.white;
+                  state.words <- t));
+            state.str <- "";
+            new_line (x_pos, y_pos);
+            if key = ' ' then { state with pos = Graphics.current_point () }
+            else { state with fin = true })
+          else
+            {
+              state with
+              pos = Graphics.current_point ();
+              str = state.str ^ String.make 1 key;
+            })
     | false -> state
 
 let round gs =
@@ -85,22 +103,13 @@ let round gs =
   in
   let start_time = Unix.gettimeofday () in
   let finished = ref false in
-  let rs_tick =
-    ref
-      {
-        pos = (100, 500);
-        str = " ";
-        fin = false;
-        typed = 0;
-        right = 0;
-        wrong = 0;
-        words = word_list;
-      }
-  in
-  Graphics.moveto 100 800;
   Graphics.set_color Graphics.black;
+  Graphics.moveto 100 800;
+  Graphics.draw_string
+    ("-LEVEL " ^ string_of_int (State.NormalGameMutable.cur_level ()) ^ "-");
+  Graphics.moveto 100 775;
   Graphics.draw_string "This round you will have:";
-  Graphics.moveto 100 770;
+  Graphics.moveto 100 750;
   Graphics.draw_string
     (string_of_int (State.NormalGameMutable.num_words ())
     ^ " words in "
@@ -112,31 +121,82 @@ let round gs =
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
   Graphics.set_color Graphics.black;
+  Graphics.moveto 100 850;
+  Graphics.draw_string
+    ("[Current Health: "
+    ^ string_of_int (State.NormalGameMutable.health ())
+    ^ "] ");
+  Graphics.draw_string
+    ("[Current Score: "
+    ^ string_of_int (State.NormalGameMutable.score ())
+    ^ "] ");
+  Graphics.draw_string
+    ("[Total Seconds Allowed This Level: "
+    ^ string_of_int (State.NormalGameMutable.time ())
+    ^ "] ");
   Graphics.moveto 100 800;
   print_words word_list;
+  new_line (1000, snd (Graphics.current_point ()));
+  new_line (1000, snd (Graphics.current_point ()));
+  let rs_tick =
+    ref
+      {
+        pos = Graphics.current_point ();
+        str = "";
+        fin = false;
+        typed = 0;
+        right = 0;
+        wrong = 0;
+        words = word_list;
+      }
+  in
   while !finished = false do
     Unix.sleepf 0.001;
     rs_tick := round_tick start_time 6000 !rs_tick;
     finished := !rs_tick.fin
   done;
+  let time_passed = time_passed start_time (Unix.gettimeofday ()) / 100 in
+  let time_given = State.NormalGameMutable.time () in
+  Unix.sleepf 1.0;
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
   Graphics.set_color Graphics.black;
   Graphics.moveto 100 800;
-  let time_passed = time_passed start_time (Unix.gettimeofday ()) in
-  let accuracy = !rs_tick.right * 100 / !rs_tick.typed in
+  let accuracy = !rs_tick.right * 100 / words_given in
   Graphics.draw_string
     ("Your accuracy was " ^ string_of_int accuracy ^ "% with "
     ^ string_of_int !rs_tick.right
-    ^ " out of " ^ string_of_int words_given ^ " words typed correctly.");
+    ^ " words typed correctly and "
+    ^ string_of_int !rs_tick.wrong
+    ^ " words typed incorrectly out of " ^ string_of_int words_given
+    ^ " words total.");
+  let health_lost_string =
+    if !rs_tick.wrong = 0 then " (no health lost)"
+    else
+      let temp = (!rs_tick.wrong + List.length !rs_tick.words) * 5 in
+      " (- " ^ string_of_int temp ^ " health)"
+  in
+  Graphics.draw_string health_lost_string;
   let words_left = Int.abs words_given - !rs_tick.typed in
-  State.NormalGameMutable.health_lost time_passed !rs_tick.wrong words_left;
+  State.NormalGameMutable.health_lost (time_given - time_passed) !rs_tick.wrong
+    words_left;
   State.NormalGameMutable.add_score !rs_tick.right;
   let cur_health = !State.NormalGameMutable._health in
-  Graphics.moveto 100 770;
+  Graphics.moveto 100 775;
+  Graphics.draw_string
+    ("You also used up " ^ string_of_int time_passed ^ " seconds out of "
+   ^ string_of_int time_given ^ " seconds given.");
+  let health_gained_string =
+    if (time_given - time_passed) / 5 = 0 then " (no health gained)"
+    else
+      let temp = (time_given - time_passed) / 5 in
+      " (+ " ^ string_of_int temp ^ " health)"
+  in
+  Graphics.draw_string health_gained_string;
+  Graphics.moveto 100 750;
   Graphics.draw_string
     ("You are now at " ^ string_of_int cur_health ^ " health!");
-  Graphics.moveto 100 740;
+  Graphics.moveto 100 725;
   if cur_health > 0 then
     ( true,
       Graphics.draw_string
@@ -153,17 +213,19 @@ let () =
   Graphics.draw_string "Rules : ";
   Graphics.moveto 100 775;
   Graphics.draw_string "1. You lose health for getting words wrong";
+  Graphics.moveto 100 750;
   Graphics.draw_string
     "2. Once you press space, we consider that a new word! You can't go back \
      to fix your mistakes :)";
-  Graphics.moveto 100 750;
+  Graphics.moveto 100 725;
   Graphics.draw_string
     "3. If you don't finish, then any words left over will also cost you some \
      health :)";
-  Graphics.moveto 100 725;
-  Graphics.draw_string
-    "4. If you have time left over, you can regain some health";
   Graphics.moveto 100 700;
+  Graphics.draw_string
+    "4. Press <ENTER> if you finish early. If you have time left over, you \
+     might regain some health :)";
+  Graphics.moveto 100 100;
   Graphics.draw_string "<PRESS ANY KEY TO CONTINUE>";
   ignore (Graphics.wait_next_event [ Key_pressed ]);
   Graphics.set_color Graphics.white;
