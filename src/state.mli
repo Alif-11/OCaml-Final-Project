@@ -40,6 +40,9 @@ module type GameStateMutable = sig
   val adjust_level : unit -> unit
   (** Adjust level depending on number of rounds *)
 
+  val decrement_level : unit -> unit
+  (** Decrease level *)
+
   val add_score : int -> unit
   (** add score based on number of correct words as passed in*)
 end

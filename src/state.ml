@@ -40,6 +40,9 @@ module type GameStateMutable = sig
   val adjust_level : unit -> unit
   (** Adjust level depending on number of rounds *)
 
+  val decrement_level : unit -> unit
+  (** Decrease level *)
+
   val add_score : int -> unit
   (** Adjust score based on number of correct words typed*)
 end
@@ -81,6 +84,11 @@ module NormalGameMutable : GameStateMutable = struct
     _cur_level := !_cur_level + 1;
     _num_words := !_num_words + 5;
     _time := !_time - 5
+
+  let decrement_level () =
+    _cur_level := !_cur_level - 1;
+    _num_words := !_num_words - 5;
+    _time := !_time + 5
 
   let add_score correct = _score := !_score + (correct * 5)
 end

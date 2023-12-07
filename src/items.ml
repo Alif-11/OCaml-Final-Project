@@ -9,7 +9,8 @@ type name =
   | ForgottenAltar
   | BloodyAltar
   | Obfuscinator
-(*| Jetpack | ReverseJetpack*)
+  | Jetpack
+  | ReverseJetpack
 
 type rarity =
   | Common
@@ -17,21 +18,26 @@ type rarity =
   | Epic
   | Undiscovered
 
-type item = name * rarity * string * string * ((* string * *) unit -> unit)
+type item = name * rarity * string * string * string list * (unit -> unit)
 
 let apple_effect () =
   let hp = NormalGameMutable._health in
   hp := !hp + 5
 
 let apple : item =
-  (Apple, Common, "Banapple", "Tastes like a banana.", apple_effect)
+  (Apple, Common, "Banapple", "Tastes like a banana.", [ "+5 HP" ], apple_effect)
 
 let banana_effect () =
   let hp = NormalGameMutable._health in
   hp := !hp + 5
 
 let banana : item =
-  (Banana, Common, "Appanana", "Tastes like an apple.", banana_effect)
+  ( Banana,
+    Common,
+    "Appanana",
+    "Tastes like an apple.",
+    [ "+5 HP" ],
+    banana_effect )
 
 let broken_clock_effect () =
   let time = NormalGameMutable._time in
@@ -42,6 +48,7 @@ let broken_clock : item =
     Rare,
     "A Broken Clock",
     "It's right twice a day, even though it's ten seconds off.",
+    [ "+10 Seconds" ],
     broken_clock_effect )
 
 let edible_clock_effect () =
@@ -55,6 +62,7 @@ let edible_clock : item =
     Epic,
     "Let Them Eat Clock",
     "It ... kinda looks like cake??",
+    [ "+10 HP"; "+15 Seconds" ],
     edible_clock_effect )
 
 let chaos_effect () =
@@ -67,7 +75,8 @@ let chaos_effect () =
     hp := 250;
     time := 90)
 
-let chaos : item = (Chaos, Undiscovered, "???", "Don't.", chaos_effect)
+let chaos : item =
+  (Chaos, Undiscovered, "???", "Don't.", [ "???" ], chaos_effect)
 
 let forgotton_altar_effect () =
   let hp = NormalGameMutable._health in
@@ -81,6 +90,7 @@ let forgotton_altar : item =
     "The TIME Altar",
     "This altar is showing clear wear and tear due to the passage of time. It \
      seems to want something from you...",
+    [ "+? HP"; "-? Seconds" ],
     forgotton_altar_effect )
 
 let bloody_altar_effect () =
@@ -95,6 +105,7 @@ let bloody_altar : item =
     "The BLOOD Altar",
     "This altar is overflowing with blood, but its pulsing for more. It seems \
      to want something from you...",
+    [ "-? HP"; "+? Seconds" ],
     forgotton_altar_effect )
 
 let obfuscinator_effect () =
@@ -110,7 +121,35 @@ let obfuscinator : item =
     "The Obfuscinator!!!",
     "Doofenshmirtz's latest invention! Allows you to make a deal with Time in \
      exchange for your soul.",
+    [ "HP <==> Seconds" ],
     obfuscinator_effect )
+
+let jetpack_effect () =
+  let hp = NormalGameMutable._health in
+  hp := !hp - 10;
+  NormalGameMutable.adjust_level ()
+
+let jetpack : item =
+  ( Jetpack,
+    Rare,
+    "Joyride",
+    "You don't have your joyriding license with you, you can't use this!",
+    [ "-10 HP"; "+1 Level" ],
+    jetpack_effect )
+
+let reverse_jetpack_effect () =
+  let hp = NormalGameMutable._health in
+  hp := !hp - 10;
+  NormalGameMutable.decrement_level ()
+
+let reverse_jetpack : item =
+  ( ReverseJetpack,
+    Epic,
+    "Suspicious Joyride",
+    "You don't have your joyriding license with you, but you can still use \
+     this!",
+    [ "-10 HP"; "+1 Level..." ],
+    jetpack_effect )
 
 module type ItemBag = sig
   type items
@@ -129,8 +168,8 @@ module ArrayItemBag : ItemBag = struct
   let itemlist =
     {
       common = [| apple; banana |];
-      rare = [| broken_clock; forgotton_altar; bloody_altar |];
-      epic = [| edible_clock; obfuscinator |];
+      rare = [| broken_clock; forgotton_altar; bloody_altar; jetpack |];
+      epic = [| edible_clock; obfuscinator; reverse_jetpack |];
       undiscovered = [| chaos |];
     }
 
@@ -153,11 +192,11 @@ module ArrayItemBag : ItemBag = struct
 end
 
 let name_to_string (item : item) =
-  let _, _, n, _, _ = item in
+  let _, _, n, _, _, _ = item in
   n
 
 let effect_to_string (item : item) =
-  let i, _, _, _, _ = item in
+  let i, _, _, _, _, _ = item in
   match i with
   | Apple -> [ "You gained 5 health."; "It still tastes like banana." ]
   | Banana -> [ "You grained 5 health."; "It still tastes like apple." ]
@@ -187,15 +226,29 @@ let effect_to_string (item : item) =
         "Your health became your time and your time became your health???";
         "The Time entity wasn't very tasty...";
       ]
+  | Jetpack ->
+      [
+        "You crashed through the roof, losing 10 heatlth.";
+        "But, you skipped a level!!!";
+      ]
+  | ReverseJetpack ->
+      [
+        "You put the jetpack on upside down, losing 10 heatlth.";
+        "You also went down a level!!!";
+      ]
 
 let flavor_to_string (item : item) =
-  let _, _, _, f, _ = item in
+  let _, _, _, f, _, _ = item in
   f
 
 let rarity_to_string (item : item) =
-  let _, r, _, _, _ = item in
+  let _, r, _, _, _, _ = item in
   match r with
   | Common -> "Common"
   | Rare -> "Rare"
   | Epic -> "Epic"
   | Undiscovered -> "Undiscovered"
+
+let stats_to_string (item : item) =
+  let _, _, _, _, s, _ = item in
+  s

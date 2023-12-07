@@ -9,19 +9,19 @@ type rarity
    a [string], and an effect as a (unit -> unit). *)
 type item
 
-(* The Banapple effect. *)
+(* Raised hp by 5. *)
 val apple_effect : unit -> unit
 
-(* The Appanana effect. *)
+(* Raised hp by 5. *)
 val banana_effect : unit -> unit
 
-(* The Broken Clock effect. *)
+(* Raised time by 10. *)
 val broken_clock_effect : unit -> unit
 
-(* The Edible Clock effect. *)
+(* Raises hp by 10, time by 15. *)
 val edible_clock_effect : unit -> unit
 
-(* The effect of Chaos. *)
+(* Chaos, chaos. *)
 val chaos_effect : unit -> unit
 
 (* The effect of the Forgotton Altar (* ominous music plays *). *)
@@ -29,6 +29,12 @@ val forgotton_altar_effect : unit -> unit
 
 (* The effect of the Bloody Altar (* less ominous music plays *). *)
 val bloody_altar_effect : unit -> unit
+
+(* Sends you up one level at the cost of 10 health. *)
+val jetpack_effect : unit -> unit
+
+(* Sends you down one level at the cost of 10 health. *)
+val reverse_jetpack_effect : unit -> unit
 
 (* The signature for the module that randomly selects an item. *)
 module type ItemBag = sig
@@ -53,3 +59,6 @@ val flavor_to_string : item -> string
 
 (* Returns the rarity of the item. *)
 val rarity_to_string : item -> string
+
+(* Returns the stats of the item. *)
+val stats_to_string : item -> string list
