@@ -69,8 +69,8 @@ let chaos_effect () =
   let hp = NormalGameMutable._health in
   let time = NormalGameMutable._time in
   if Random.int 2 = 0 then (
-    hp := 0;
-    time := 0)
+    hp := 1;
+    time := 60)
   else (
     hp := 250;
     time := 90)
