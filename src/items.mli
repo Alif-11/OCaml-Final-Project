@@ -62,3 +62,6 @@ val rarity_to_string : item -> string
 
 (* Returns the stats of the item. *)
 val stats_to_string : item -> string list
+
+(* Applies the item. *)
+val apply_item : item -> unit

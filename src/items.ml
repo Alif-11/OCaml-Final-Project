@@ -252,3 +252,7 @@ let rarity_to_string (item : item) =
 let stats_to_string (item : item) =
   let _, _, _, _, s, _ = item in
   s
+
+let apply_item (item : item) =
+  let _, _, _, _, _, f = item in
+  f ()
