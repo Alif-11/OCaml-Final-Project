@@ -16,6 +16,7 @@ module type GameStateMutable = sig
   val _max_health : int ref
   val _cur_level : int ref
   val _score : int ref
+  val _num_items : int ref
 
   val num_words : unit -> int
   (** Number of words to be generated *)
@@ -33,6 +34,9 @@ module type GameStateMutable = sig
   (** Number of rounds player has passed so far *)
 
   val score : unit -> int
+
+  val num_items : unit -> int
+  (** the number of items drawn each time*)
 
   val health_lost : int -> int -> int -> unit
   (** Calculates health lost given time remaining, accuracy, words remaining *)
@@ -56,6 +60,7 @@ module NormalGameMutable : GameStateMutable = struct
   let _max_health = ref 0
   let _cur_level = ref 0
   let _score = ref 0
+  let _num_items = ref 3
 
   let initialize () =
     _time := 120;
@@ -73,6 +78,7 @@ module NormalGameMutable : GameStateMutable = struct
   let max_health () = !_max_health
   let cur_level () = !_cur_level
   let score () = !_score
+  let num_items () = !_num_items
 
   let health_lost time_left missed words_left =
     _health :=

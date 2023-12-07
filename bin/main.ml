@@ -88,6 +88,73 @@ let round_tick start_time time_allotted (state : round_state) =
         else state
     | false -> state
 
+let item_select () =
+  let rec item_gen n acc =
+    if n = 0 then acc
+    else item_gen (n - 1) (Items.ArrayItemBag.obtain_item () :: acc)
+  in
+  let item_list = item_gen (State.NormalGameMutable.num_items ()) [] in
+  let rec draw_list_spaced stat_list =
+    match stat_list with
+    | [] -> ()
+    | h :: t ->
+        Graphics.draw_string h;
+        new_line (1000, Graphics.current_y ());
+        draw_list_spaced t
+  in
+  let rec print_items n lst =
+    match lst with
+    | [] -> ()
+    | h :: t ->
+        Graphics.draw_string
+          ("Item <" ^ string_of_int n ^ ">: " ^ Items.name_to_string h);
+        new_line (1000, Graphics.current_y ());
+        Graphics.draw_string ("[" ^ Items.rarity_to_string h ^ "]");
+        new_line (1000, Graphics.current_y ());
+        Graphics.draw_string (Items.flavor_to_string h);
+        new_line (1000, Graphics.current_y ());
+        draw_list_spaced (Items.stats_to_string h);
+        new_line (1000, Graphics.current_y ());
+        print_items (n + 1) t
+  in
+  Graphics.moveto 100 800;
+  Graphics.set_color Graphics.white;
+  Graphics.fill_rect 0 0 1000 1000;
+  Graphics.set_color Graphics.black;
+  Graphics.draw_string "Choose an item:";
+  new_line (1000, Graphics.current_y ());
+  print_items 1 item_list;
+  let item_chosen = ref false in
+  while not !item_chosen do
+    if Graphics.key_pressed () then
+      let key = Graphics.read_key () in
+      let ascii_key = Char.code key in
+      if ascii_key >= 48 && ascii_key <= 57 then (
+        let item_num_string = String.make 1 key in
+        let item_num = int_of_string item_num_string in
+        if item_num > 0 && item_num <= State.NormalGameMutable.num_items () then (
+          let chosen_item = List.nth item_list (item_num - 1) in
+          Graphics.draw_string
+            ("You've chosen item " ^ item_num_string ^ ": "
+            ^ Items.name_to_string chosen_item
+            ^ "!");
+          new_line (1000, Graphics.current_y ());
+          draw_list_spaced (Items.effect_to_string chosen_item);
+          Items.apply_item chosen_item;
+          new_line (1000, Graphics.current_y ());
+          item_chosen := true;
+          Graphics.draw_string "<PRESS ANY KEY TO CONTINUE>";
+          ignore (Graphics.wait_next_event [ Key_pressed ]);
+          Graphics.set_color Graphics.white;
+          Graphics.fill_rect 0 0 1000 1000;
+          Graphics.set_color Graphics.black))
+      else (
+        Graphics.draw_string "Please choose a valid item number.";
+        new_line (1000, Graphics.current_y ()))
+    else ()
+  done;
+  ()
+
 let round gs =
   Graphics.moveto 100 800;
   let word_list =
@@ -162,6 +229,7 @@ let round gs =
   let time_passed = int_of_float (Float.round (cur_time -. start_time)) in
   let time_given = State.NormalGameMutable.time () in
   Unix.sleepf 1.0;
+  item_select ();
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
   Graphics.set_color Graphics.black;
@@ -185,7 +253,9 @@ let round gs =
   State.NormalGameMutable.health_lost (time_given - time_passed) !rs_tick.wrong
     words_left;
   State.NormalGameMutable.add_score !rs_tick.right;
-  let cur_health = !State.NormalGameMutable._health in
+  let cur_health = State.NormalGameMutable.health () in
+  print_string (string_of_int (State.NormalGameMutable.health ()));
+  print_newline ();
   Graphics.moveto 100 775;
   Graphics.draw_string
     ("You also used up " ^ string_of_int time_passed ^ " seconds out of "
@@ -231,6 +301,10 @@ let round gs =
     true)
   else (
     Graphics.draw_string "You died! Better luck next time.";
+    new_line (1000, Graphics.current_y ());
+    Graphics.draw_string
+      ("Your final score was "
+      ^ string_of_int (State.NormalGameMutable.score ()));
     false)
 
 let () =

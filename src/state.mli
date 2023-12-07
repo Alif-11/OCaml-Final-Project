@@ -15,6 +15,7 @@ module type GameStateMutable = sig
   val _max_health : int ref
   val _cur_level : int ref
   val _score : int ref
+  val _num_items : int ref
 
   val num_words : unit -> int
   (** Number of words to be generated *)
@@ -32,6 +33,10 @@ module type GameStateMutable = sig
   (** Number of rounds player has passed so far *)
 
   val score : unit -> int
+  (** Current player score*)
+
+  val num_items : unit -> int
+  (** Number of items generated each time*)
 
   val health_lost : int -> int -> int -> unit
   (** Calculates health lost given time remaining, words wrong and words
