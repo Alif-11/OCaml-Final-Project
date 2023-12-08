@@ -40,8 +40,7 @@ let banana : item =
     banana_effect )
 
 let broken_clock_effect () =
-  NormalGameMutable._health :=
-    min (NormalGameMutable.health () + 10) (NormalGameMutable.max_health ())
+  NormalGameMutable._time := NormalGameMutable.time () + 10
 
 let broken_clock : item =
   ( BrokenClock,
@@ -69,7 +68,7 @@ let chaos_effect () =
     NormalGameMutable._health := 1;
     NormalGameMutable._time := 60)
   else (
-    NormalGameMutable._health := 250;
+    NormalGameMutable._health := NormalGameMutable.max_health ();
     NormalGameMutable._time := 90)
 
 let chaos : item =
