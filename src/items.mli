@@ -40,6 +40,13 @@ val reverse_jetpack_effect : unit -> string -> unit
    the current health. *)
 val big_frying_pan_effect : unit -> string -> unit
 
+(* Removes 4 from num_words. Lowest it can go is 10.*)
+val word_eviscer_inator_effect : unit -> string -> unit
+
+(* An unfortunate encounter. Reduces max health by current health, then sets
+   your current health to that difference. *)
+val black_cat_trinket_effect : unit -> string -> unit
+
 (* The signature for the module that randomly selects an item. *)
 module type ItemBag = sig
   (* The data representation for pulling an item. *)

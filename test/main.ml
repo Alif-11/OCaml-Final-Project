@@ -74,14 +74,24 @@ let join_tests =
 
 let item_tests =
   [
-    ( "initialize" >:: fun _ ->
+    ( "initialize_jetpack" >:: fun _ ->
       Gam.initialize ();
       ItemTester.jetpack_effect () "Hard";
       assert_equal (Gam.health ()) 90 );
-    ( "initialize" >:: fun _ ->
+    ( "initialize_bloodAltar" >:: fun _ ->
       Gam.initialize ();
       ItemTester.bloody_altar_effect () "Hard";
       assert_equal (Gam.health ()) 50 );
+    ( "max_health + 5, losing health and changing level" >:: fun _ ->
+      Gam.initialize ();
+      ItemTester.banana_effect () "Hard";
+      assert_equal (Gam.health ()) 100;
+      ItemTester.jetpack_effect () "Hard";
+      assert_equal (Gam.health ()) 90;
+      assert_equal (Gam.cur_level ()) 1;
+      ItemTester.reverse_jetpack_effect () "Hard";
+      assert_equal (Gam.health ()) 80;
+      assert_equal (Gam.cur_level ()) 0 );
   ]
 
 let test_list = to_list_tests @ of_list_tests @ join_tests @ item_tests
