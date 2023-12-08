@@ -3,7 +3,7 @@ module WB = TypeGame.Game.WordBag
 module ItemTester = TypeGame.Items
 module IBag = ItemTester.ArrayItemBag
 module StateTester = TypeGame.State
-module Gam = StateTester.NormalGameMutable
+module Gam = StateTester.HardGameMutable
 
 (* [cmp_bag_like_lists lst1 lst2] compares two lists to see whether they are
    equivalent bag-like lists. That means checking that they they contain the
@@ -76,11 +76,11 @@ let item_tests =
   [
     ( "initialize" >:: fun _ ->
       Gam.initialize ();
-      ItemTester.jetpack_effect ();
+      ItemTester.jetpack_effect () "Hard";
       assert_equal (Gam.health ()) 90 );
     ( "initialize" >:: fun _ ->
       Gam.initialize ();
-      ItemTester.bloody_altar_effect ();
+      ItemTester.bloody_altar_effect () "Hard";
       assert_equal (Gam.health ()) 50 );
   ]
 

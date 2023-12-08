@@ -10,31 +10,31 @@ type rarity
 type item
 
 (* Raised hp by 5. *)
-val apple_effect : unit -> unit
+val apple_effect : unit -> string -> unit
 
 (* Raised hp by 5. *)
-val banana_effect : unit -> unit
+val banana_effect : unit -> string -> unit
 
 (* Raised time by 10. *)
-val broken_clock_effect : unit -> unit
+val broken_clock_effect : unit -> string -> unit
 
 (* Raises hp by 10, time by 15. *)
-val edible_clock_effect : unit -> unit
+val edible_clock_effect : unit -> string -> unit
 
 (* Chaos, chaos. *)
-val chaos_effect : unit -> unit
+val chaos_effect : unit -> string -> unit
 
 (* The effect of the Forgotton Altar (* ominous music plays *). *)
-val forgotton_altar_effect : unit -> unit
+val forgotton_altar_effect : unit -> string -> unit
 
 (* The effect of the Bloody Altar (* less ominous music plays *). *)
-val bloody_altar_effect : unit -> unit
+val bloody_altar_effect : unit -> string -> unit
 
 (* Sends you up one level at the cost of 10 health. *)
-val jetpack_effect : unit -> unit
+val jetpack_effect : unit -> string -> unit
 
 (* Sends you down one level at the cost of 10 health. *)
-val reverse_jetpack_effect : unit -> unit
+val reverse_jetpack_effect : unit -> string -> unit
 
 (* The signature for the module that randomly selects an item. *)
 module type ItemBag = sig
@@ -64,4 +64,4 @@ val rarity_to_string : item -> string
 val stats_to_string : item -> string list
 
 (* Applies the item. *)
-val apply_item : item -> unit
+val apply_item : item -> string -> unit

@@ -18,18 +18,53 @@ type rarity =
   | Epic
   | Undiscovered
 
-type item = name * rarity * string * string * string list * (unit -> unit)
+type item =
+  name * rarity * string * string * string list * (unit -> string -> unit)
 
-let apple_effect () =
-  NormalGameMutable._health :=
-    min (NormalGameMutable.health () + 5) (NormalGameMutable.max_health ())
+let apple_effect () (mode : string) =
+  if mode = "Easy" then
+    EasyGameMutable._health :=
+      min (EasyGameMutable.health () + 5) (EasyGameMutable.max_health ())
+  else if mode = "Normal" then
+    NormalGameMutable._health :=
+      min (NormalGameMutable.health () + 5) (NormalGameMutable.max_health ())
+  else if mode = "Hard" then
+    HardGameMutable._health :=
+      min (HardGameMutable.health () + 5) (HardGameMutable.max_health ())
+  else if mode = "Extreme" then
+    ExtremeGameMutable._health :=
+      min (ExtremeGameMutable.health () + 5) (ExtremeGameMutable.max_health ())
+  else if mode = "Sudden Death" then
+    SuddenDeathMutable._health :=
+      min (SuddenDeathMutable.health () + 5) (SuddenDeathMutable.max_health ())
+  else if mode = "Chaos" then
+    ChaosGameMutable._health :=
+      min (ChaosGameMutable.health () + 5) (ChaosGameMutable.max_health ())
+  else failwith "Item cringe"
 
 let apple : item =
   (Apple, Common, "Banapple", "Tastes like a banana.", [ "+5 HP" ], apple_effect)
 
-let banana_effect () =
-  NormalGameMutable._health :=
-    min (NormalGameMutable.health () + 5) (NormalGameMutable.max_health ())
+let banana_effect () (mode : string) =
+  if mode = "Easy" then
+    EasyGameMutable._health :=
+      min (EasyGameMutable.health () + 5) (EasyGameMutable.max_health ())
+  else if mode = "Normal" then
+    NormalGameMutable._health :=
+      min (NormalGameMutable.health () + 5) (NormalGameMutable.max_health ())
+  else if mode = "Hard" then
+    HardGameMutable._health :=
+      min (HardGameMutable.health () + 5) (HardGameMutable.max_health ())
+  else if mode = "Extreme" then
+    ExtremeGameMutable._health :=
+      min (ExtremeGameMutable.health () + 5) (ExtremeGameMutable.max_health ())
+  else if mode = "Sudden Death" then
+    SuddenDeathMutable._health :=
+      min (SuddenDeathMutable.health () + 5) (SuddenDeathMutable.max_health ())
+  else if mode = "Chaos" then
+    ChaosGameMutable._health :=
+      min (ChaosGameMutable.health () + 5) (ChaosGameMutable.max_health ())
+  else failwith "Item cringe"
 
 let banana : item =
   ( Banana,
@@ -39,8 +74,19 @@ let banana : item =
     [ "+5 HP" ],
     banana_effect )
 
-let broken_clock_effect () =
-  NormalGameMutable._time := NormalGameMutable.time () + 10
+let broken_clock_effect () (mode : string) =
+  if mode = "Easy" then EasyGameMutable._time := EasyGameMutable.time () + 10
+  else if mode = "Normal" then
+    NormalGameMutable._time := NormalGameMutable.time () + 10
+  else if mode = "Hard" then
+    HardGameMutable._time := HardGameMutable.time () + 10
+  else if mode = "Extreme" then
+    ExtremeGameMutable._time := ExtremeGameMutable.time () + 10
+  else if mode = "Sudden Death" then
+    SuddenDeathMutable._time := SuddenDeathMutable.time () + 10
+  else if mode = "Chaos" then
+    ChaosGameMutable._time := ChaosGameMutable.time () + 10
+  else failwith "Item cringe"
 
 let broken_clock : item =
   ( BrokenClock,
@@ -50,10 +96,26 @@ let broken_clock : item =
     [ "+10 Seconds" ],
     broken_clock_effect )
 
-let edible_clock_effect () =
-  NormalGameMutable._health :=
-    min (NormalGameMutable.health () + 10) (NormalGameMutable.max_health ());
-  NormalGameMutable._time := NormalGameMutable.time () + 15
+let edible_clock_effect () (mode : string) =
+  if mode = "Easy" then (
+    EasyGameMutable._time := EasyGameMutable.time () + 10;
+    EasyGameMutable._health := EasyGameMutable.health () + 15)
+  else if mode = "Normal" then (
+    NormalGameMutable._time := NormalGameMutable.time () + 10;
+    NormalGameMutable._health := NormalGameMutable.health () + 15)
+  else if mode = "Hard" then (
+    HardGameMutable._time := HardGameMutable.time () + 10;
+    HardGameMutable._health := HardGameMutable.health () + 15)
+  else if mode = "Extreme" then (
+    ExtremeGameMutable._time := ExtremeGameMutable.time () + 10;
+    ExtremeGameMutable._health := ExtremeGameMutable.health () + 15)
+  else if mode = "Sudden Death" then (
+    SuddenDeathMutable._time := SuddenDeathMutable.time () + 10;
+    SuddenDeathMutable._health := SuddenDeathMutable.health () + 15)
+  else if mode = "Chaos" then (
+    ChaosGameMutable._time := ChaosGameMutable.time () + 10;
+    ChaosGameMutable._health := ChaosGameMutable.health () + 15)
+  else failwith "Item cringe"
 
 let edible_clock : item =
   ( EdibleClock,
@@ -63,21 +125,80 @@ let edible_clock : item =
     [ "+10 HP"; "+15 Seconds" ],
     edible_clock_effect )
 
-let chaos_effect () =
-  if Random.int 2 = 0 then (
-    NormalGameMutable._health := 1;
-    NormalGameMutable._time := 60)
-  else (
-    NormalGameMutable._health := NormalGameMutable.max_health ();
-    NormalGameMutable._time := 90)
+let chaos_effect () (mode : string) =
+  if mode = "Easy" then
+    if Random.int 2 = 0 then (
+      EasyGameMutable._health := 1;
+      EasyGameMutable._time := 60)
+    else (
+      EasyGameMutable._health := EasyGameMutable.max_health ();
+      EasyGameMutable._time := 90)
+  else if mode = "Normal" then
+    if Random.int 2 = 0 then (
+      NormalGameMutable._health := 1;
+      NormalGameMutable._time := 60)
+    else (
+      NormalGameMutable._health := NormalGameMutable.max_health ();
+      NormalGameMutable._time := 90)
+  else if mode = "Hard" then
+    if Random.int 2 = 0 then (
+      HardGameMutable._health := 1;
+      HardGameMutable._time := 60)
+    else (
+      HardGameMutable._health := HardGameMutable.max_health ();
+      HardGameMutable._time := 90)
+  else if mode = "Extreme" then
+    if Random.int 2 = 0 then (
+      ExtremeGameMutable._health := 1;
+      ExtremeGameMutable._time := 60)
+    else (
+      ExtremeGameMutable._health := ExtremeGameMutable.max_health ();
+      ExtremeGameMutable._time := 90)
+  else if mode = "Sudden Death" then
+    if Random.int 2 = 0 then (
+      SuddenDeathMutable._health := 1;
+      SuddenDeathMutable._time := 60)
+    else (
+      SuddenDeathMutable._health := SuddenDeathMutable.max_health ();
+      SuddenDeathMutable._time := 90)
+  else if mode = "Chaos" then
+    if Random.int 2 = 0 then (
+      ChaosGameMutable._health := 1;
+      ChaosGameMutable._time := 60)
+    else (
+      ChaosGameMutable._health := ChaosGameMutable.max_health ();
+      ChaosGameMutable._time := 90)
+  else failwith "Item cringe"
 
 let chaos : item =
   (Chaos, Undiscovered, "???", "Don't.", [ "???" ], chaos_effect)
 
-let forgotton_altar_effect () =
-  NormalGameMutable._time := NormalGameMutable.time () / 2;
-  NormalGameMutable._health :=
-    min (NormalGameMutable.health () * 2) (NormalGameMutable.max_health ())
+let forgotton_altar_effect () (mode : string) =
+  if mode = "Easy" then (
+    EasyGameMutable._time := EasyGameMutable.time () / 2;
+    EasyGameMutable._health :=
+      min (EasyGameMutable.health () * 2) (EasyGameMutable.max_health ()))
+  else if mode = "Normal" then (
+    NormalGameMutable._time := NormalGameMutable.time () / 2;
+    NormalGameMutable._health :=
+      min (NormalGameMutable.health () * 2) (NormalGameMutable.max_health ()))
+  else if mode = "Hard" then (
+    HardGameMutable._time := HardGameMutable.time () / 2;
+    HardGameMutable._health :=
+      min (HardGameMutable.health () * 2) (HardGameMutable.max_health ()))
+  else if mode = "Extreme" then (
+    ExtremeGameMutable._time := ExtremeGameMutable.time () / 2;
+    ExtremeGameMutable._health :=
+      min (ExtremeGameMutable.health () * 2) (ExtremeGameMutable.max_health ()))
+  else if mode = "Sudden Death" then (
+    SuddenDeathMutable._time := SuddenDeathMutable.time () / 2;
+    SuddenDeathMutable._health :=
+      min (SuddenDeathMutable.health () * 2) (SuddenDeathMutable.max_health ()))
+  else if mode = "Chaos" then (
+    ChaosGameMutable._time := ChaosGameMutable.time () / 2;
+    ChaosGameMutable._health :=
+      min (ChaosGameMutable.health () * 2) (ChaosGameMutable.max_health ()))
+  else failwith "Item cringe"
 
 let forgotton_altar : item =
   ( ForgottenAltar,
@@ -88,9 +209,29 @@ let forgotton_altar : item =
     [ "+? HP"; "-? Seconds" ],
     forgotton_altar_effect )
 
-let bloody_altar_effect () =
-  NormalGameMutable._time := NormalGameMutable.time () * 2;
-  NormalGameMutable._health := max (min (NormalGameMutable.health () / 2) 100) 1
+let bloody_altar_effect () (mode : string) =
+  if mode = "Easy" then (
+    EasyGameMutable._time := EasyGameMutable.time () * 2;
+    EasyGameMutable._health := max (min (EasyGameMutable.health () / 2) 100) 1)
+  else if mode = "Normal" then (
+    NormalGameMutable._time := NormalGameMutable.time () * 2;
+    NormalGameMutable._health :=
+      max (min (NormalGameMutable.health () / 2) 100) 1)
+  else if mode = "Hard" then (
+    HardGameMutable._time := HardGameMutable.time () * 2;
+    HardGameMutable._health := max (min (HardGameMutable.health () / 2) 100) 1)
+  else if mode = "Extreme" then (
+    ExtremeGameMutable._time := ExtremeGameMutable.time () * 2;
+    ExtremeGameMutable._health :=
+      max (min (ExtremeGameMutable.health () / 2) 100) 1)
+  else if mode = "Sudden Death" then (
+    SuddenDeathMutable._time := SuddenDeathMutable.time () * 2;
+    SuddenDeathMutable._health :=
+      max (min (SuddenDeathMutable.health () / 2) 100) 1)
+  else if mode = "Chaos" then (
+    ChaosGameMutable._time := ChaosGameMutable.time () * 2;
+    ChaosGameMutable._health := max (min (ChaosGameMutable.health () / 2) 100) 1)
+  else failwith "Item cringe"
 
 let bloody_altar : item =
   ( BloodyAltar,
@@ -101,10 +242,32 @@ let bloody_altar : item =
     [ "-? HP"; "+? Seconds" ],
     forgotton_altar_effect )
 
-let obfuscinator_effect () =
-  let tmp = NormalGameMutable.time () in
-  NormalGameMutable._time := NormalGameMutable.health ();
-  NormalGameMutable._health := tmp
+let obfuscinator_effect () (mode : string) =
+  if mode = "Easy" then (
+    let tmp = EasyGameMutable.time () in
+    EasyGameMutable._time := EasyGameMutable.health ();
+    EasyGameMutable._health := tmp)
+  else if mode = "Normal" then (
+    let tmp = NormalGameMutable.time () in
+    NormalGameMutable._time := NormalGameMutable.health ();
+    NormalGameMutable._health := tmp)
+  else if mode = "Hard" then (
+    let tmp = HardGameMutable.time () in
+    HardGameMutable._time := HardGameMutable.health ();
+    HardGameMutable._health := tmp)
+  else if mode = "Extreme" then (
+    let tmp = ExtremeGameMutable.time () in
+    ExtremeGameMutable._time := ExtremeGameMutable.health ();
+    ExtremeGameMutable._health := tmp)
+  else if mode = "Sudden Death" then (
+    let tmp = SuddenDeathMutable.time () in
+    SuddenDeathMutable._time := SuddenDeathMutable.health ();
+    SuddenDeathMutable._health := tmp)
+  else if mode = "Chaos" then (
+    let tmp = ChaosGameMutable.time () in
+    ChaosGameMutable._time := ChaosGameMutable.health ();
+    ChaosGameMutable._health := tmp)
+  else failwith "Item cringe"
 
 let obfuscinator : item =
   ( Obfuscinator,
@@ -115,9 +278,26 @@ let obfuscinator : item =
     [ "HP <==> Seconds" ],
     obfuscinator_effect )
 
-let jetpack_effect () =
-  NormalGameMutable._health := NormalGameMutable.health () - 10;
-  NormalGameMutable.adjust_level ()
+let jetpack_effect () (mode : string) =
+  if mode = "Easy" then (
+    EasyGameMutable._health := EasyGameMutable.health () - 10;
+    EasyGameMutable.adjust_level ())
+  else if mode = "Normal" then (
+    NormalGameMutable._health := NormalGameMutable.health () - 10;
+    NormalGameMutable.adjust_level ())
+  else if mode = "Hard" then (
+    HardGameMutable._health := HardGameMutable.health () - 10;
+    HardGameMutable.adjust_level ())
+  else if mode = "Extreme" then (
+    ExtremeGameMutable._health := ExtremeGameMutable.health () - 10;
+    ExtremeGameMutable.adjust_level ())
+  else if mode = "Sudden Death" then (
+    SuddenDeathMutable._health := SuddenDeathMutable.health () - 10;
+    SuddenDeathMutable.adjust_level ())
+  else if mode = "Chaos" then (
+    ChaosGameMutable._health := ChaosGameMutable.health () - 10;
+    ChaosGameMutable.adjust_level ())
+  else failwith "Item cringe"
 
 let jetpack : item =
   ( Jetpack,
@@ -127,9 +307,26 @@ let jetpack : item =
     [ "-10 HP"; "+1 Level" ],
     jetpack_effect )
 
-let reverse_jetpack_effect () =
-  NormalGameMutable._health := NormalGameMutable.health () - 10;
-  NormalGameMutable.decrement_level ()
+let reverse_jetpack_effect () (mode : string) =
+  if mode = "Easy" then (
+    EasyGameMutable._health := EasyGameMutable.health () - 10;
+    EasyGameMutable.decrement_level ())
+  else if mode = "Normal" then (
+    NormalGameMutable._health := NormalGameMutable.health () - 10;
+    NormalGameMutable.decrement_level ())
+  else if mode = "Hard" then (
+    HardGameMutable._health := HardGameMutable.health () - 10;
+    HardGameMutable.decrement_level ())
+  else if mode = "Extreme" then (
+    ExtremeGameMutable._health := ExtremeGameMutable.health () - 10;
+    ExtremeGameMutable.decrement_level ())
+  else if mode = "Sudden Death" then (
+    SuddenDeathMutable._health := SuddenDeathMutable.health () - 10;
+    SuddenDeathMutable.decrement_level ())
+  else if mode = "Chaos" then (
+    ChaosGameMutable._health := ChaosGameMutable.health () - 10;
+    ChaosGameMutable.decrement_level ())
+  else failwith "Item cringe"
 
 let reverse_jetpack : item =
   ( ReverseJetpack,
@@ -242,6 +439,6 @@ let stats_to_string (item : item) =
   let _, _, _, _, s, _ = item in
   s
 
-let apply_item (item : item) =
+let apply_item (item : item) (mode : string) =
   let _, _, _, _, _, f = item in
-  f ()
+  f () mode
