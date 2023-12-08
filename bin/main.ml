@@ -338,7 +338,15 @@ let round gm =
   let time_passed = int_of_float (Float.round (cur_time -. start_time)) in
   let time_given = game_get_time gm in
   Unix.sleepf 1.0;
+  let words_left = Int.abs words_given - !rs_tick.typed in
+  let hp =
+    game_health_lost gm (time_given - time_passed) !rs_tick.wrong words_left
+  in
+  print_string (string_of_int (game_get_health gm));
+  print_newline ();
   item_select gm;
+  print_string (string_of_int (game_get_health gm));
+  print_newline ();
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
   Graphics.set_color Graphics.black;
@@ -351,13 +359,9 @@ let round gm =
     ^ string_of_int !rs_tick.wrong
     ^ " words typed incorrectly out of " ^ string_of_int words_given
     ^ " words total.");
-  let words_left = Int.abs words_given - !rs_tick.typed in
-  let hp =
-    game_health_lost gm (time_given - time_passed) !rs_tick.wrong words_left
-  in
   let health_lost_string =
     if fst hp = 0 then " (no health lost)"
-    else " (- " ^ string_of_int (fst hp) ^ " health)"
+    else " (" ^ string_of_int (fst hp) ^ " health)"
   in
   Graphics.draw_string health_lost_string;
   let score_gain = game_add_score gm !rs_tick.right in
