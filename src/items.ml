@@ -13,6 +13,7 @@ type name =
   | ReverseJetpack
   | BigFryingPan
   | WordEviscerInator
+  | BlackCatTrinket
 
 type rarity =
   | Common
@@ -428,6 +429,35 @@ let word_eviscer_inator : item =
     [ "-4 Number of Words" ],
     word_eviscer_inator_effect )
 
+let black_cat_trinket_effect () (mode : string) =
+  if mode = "Easy" then
+    EasyGameMutable._health :=
+      max 1 (EasyGameMutable.max_health () - EasyGameMutable.health ())
+  else if mode = "Normal" then
+    NormalGameMutable._health :=
+      max 1 (NormalGameMutable.max_health () - NormalGameMutable.health ())
+  else if mode = "Hard" then
+    HardGameMutable._health :=
+      max 1 (HardGameMutable.max_health () - HardGameMutable.health ())
+  else if mode = "Extreme" then
+    ExtremeGameMutable._health :=
+      max 1 (ExtremeGameMutable.max_health () - ExtremeGameMutable.health ())
+  else if mode = "Sudden Death" then
+    SuddenDeathMutable._health :=
+      max 1 (SuddenDeathMutable.max_health () - SuddenDeathMutable.health ())
+  else if mode = "Chaos" then
+    ChaosGameMutable._health :=
+      max 1 (ChaosGameMutable.max_health () - ChaosGameMutable.health ())
+  else failwith "Item cringe"
+
+let black_cat_trinket : item =
+  ( BlackCatTrinket,
+    Undiscovered,
+    "A Cat Trinket",
+    "An unfortunate encounter.",
+    [ "??? h*a*th" ],
+    black_cat_trinket_effect )
+
 module type ItemBag = sig
   type items
 
@@ -451,7 +481,7 @@ module ArrayItemBag : ItemBag = struct
         |];
       epic =
         [| edible_clock; obfuscinator; reverse_jetpack; word_eviscer_inator |];
-      undiscovered = [| chaos |];
+      undiscovered = [| chaos; black_cat_trinket |];
     }
 
   let obtain_item () =
@@ -488,8 +518,7 @@ let effect_to_string (item : item) =
         "You gained 15 seconds.";
         "This was a tasty clock.";
       ]
-  | Chaos ->
-      [ "You were warned..."; "You didn't have much to eat this time around." ]
+  | Chaos -> [ "You were warned..." ]
   | ForgottenAltar ->
       [
         "You gained ??? health.";
@@ -523,6 +552,7 @@ let effect_to_string (item : item) =
         "The hippo thanks you for the feast.";
         "You have 4 less words to deal with in the next round.";
       ]
+  | BlackCatTrinket -> [ "You were warned..." ]
 
 let flavor_to_string (item : item) =
   let _, _, _, f, _, _ = item in
