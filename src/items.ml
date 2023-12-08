@@ -11,6 +11,7 @@ type name =
   | Obfuscinator
   | Jetpack
   | ReverseJetpack
+  | BigFryingPan
 
 type rarity =
   | Common
@@ -212,25 +213,46 @@ let forgotton_altar : item =
 let bloody_altar_effect () (mode : string) =
   if mode = "Easy" then (
     EasyGameMutable._time := EasyGameMutable.time () * 2;
-    EasyGameMutable._health := max (min (EasyGameMutable.health () / 2) 100) 1)
+    EasyGameMutable._health :=
+      max
+        (min (EasyGameMutable.health () / 2) (EasyGameMutable.max_health ()))
+        1)
   else if mode = "Normal" then (
     NormalGameMutable._time := NormalGameMutable.time () * 2;
     NormalGameMutable._health :=
-      max (min (NormalGameMutable.health () / 2) 100) 1)
+      max
+        (min
+           (NormalGameMutable.health () / 2)
+           (NormalGameMutable.max_health ()))
+        1)
   else if mode = "Hard" then (
     HardGameMutable._time := HardGameMutable.time () * 2;
-    HardGameMutable._health := max (min (HardGameMutable.health () / 2) 100) 1)
+    HardGameMutable._health :=
+      max
+        (min (HardGameMutable.health () / 2) (HardGameMutable.max_health ()))
+        1)
   else if mode = "Extreme" then (
     ExtremeGameMutable._time := ExtremeGameMutable.time () * 2;
     ExtremeGameMutable._health :=
-      max (min (ExtremeGameMutable.health () / 2) 100) 1)
+      max
+        (min
+           (ExtremeGameMutable.health () / 2)
+           (ExtremeGameMutable.max_health ()))
+        1)
   else if mode = "Sudden Death" then (
     SuddenDeathMutable._time := SuddenDeathMutable.time () * 2;
     SuddenDeathMutable._health :=
-      max (min (SuddenDeathMutable.health () / 2) 100) 1)
+      max
+        (min
+           (SuddenDeathMutable.health () / 2)
+           (SuddenDeathMutable.max_health ()))
+        1)
   else if mode = "Chaos" then (
     ChaosGameMutable._time := ChaosGameMutable.time () * 2;
-    ChaosGameMutable._health := max (min (ChaosGameMutable.health () / 2) 100) 1)
+    ChaosGameMutable._health :=
+      max
+        (min (ChaosGameMutable.health () / 2) (ChaosGameMutable.max_health ()))
+        1)
   else failwith "Item cringe"
 
 let bloody_altar : item =
@@ -240,7 +262,7 @@ let bloody_altar : item =
     "This altar is overflowing with blood, but its pulsing for more. It seems \
      to want something from you...",
     [ "-? HP"; "+? Seconds" ],
-    forgotton_altar_effect )
+    bloody_altar_effect )
 
 let obfuscinator_effect () (mode : string) =
   if mode = "Easy" then (
@@ -337,6 +359,43 @@ let reverse_jetpack : item =
     [ "-10 HP"; "+1 Level..." ],
     jetpack_effect )
 
+let big_frying_pan_effect () (mode : string) =
+  if mode = "Easy" then (
+    EasyGameMutable._max_health := max (EasyGameMutable.max_health () - 5) 1;
+    EasyGameMutable._health :=
+      min (EasyGameMutable.max_health ()) (EasyGameMutable.health ()))
+  else if mode = "Normal" then (
+    NormalGameMutable._max_health := max (NormalGameMutable.max_health () - 5) 1;
+    NormalGameMutable._health :=
+      min (NormalGameMutable.max_health ()) (NormalGameMutable.health ()))
+  else if mode = "Hard" then (
+    HardGameMutable._max_health := max (HardGameMutable.max_health () - 5) 1;
+    HardGameMutable._health :=
+      min (HardGameMutable.max_health ()) (HardGameMutable.health ()))
+  else if mode = "Extreme" then (
+    ExtremeGameMutable._max_health :=
+      max (ExtremeGameMutable.max_health () - 5) 1;
+    ExtremeGameMutable._health :=
+      min (ExtremeGameMutable.max_health ()) (ExtremeGameMutable.health ()))
+  else if mode = "Sudden Death" then (
+    SuddenDeathMutable._max_health :=
+      max (SuddenDeathMutable.max_health () - 5) 1;
+    SuddenDeathMutable._health :=
+      min (SuddenDeathMutable.max_health ()) (SuddenDeathMutable.health ()))
+  else if mode = "Chaos" then (
+    ChaosGameMutable._max_health := max (ChaosGameMutable.max_health () - 5) 1;
+    ChaosGameMutable._health :=
+      min (ChaosGameMutable.max_health ()) (ChaosGameMutable.health ()))
+  else failwith "Item cringe"
+
+let big_frying_pan : item =
+  ( BigFryingPan,
+    Rare,
+    "Beeg Frying Pan",
+    "It's ... it's big! And it looks angry!",
+    [ "+5 Max HP (?)" ],
+    big_frying_pan_effect )
+
 module type ItemBag = sig
   type items
 
@@ -422,6 +481,7 @@ let effect_to_string (item : item) =
         "You put the jetpack on upside down, losing 10 heatlth.";
         "You also went down a level!!!";
       ]
+  | BigFryingPan -> [ "Haha! You lost 5 max health! Hahah!!" ]
 
 let flavor_to_string (item : item) =
   let _, _, _, f, _, _ = item in
