@@ -413,7 +413,10 @@ module ArrayItemBag : ItemBag = struct
   let itemlist =
     {
       common = [| apple; banana |];
-      rare = [| broken_clock; forgotton_altar; bloody_altar; jetpack |];
+      rare =
+        [|
+          broken_clock; forgotton_altar; bloody_altar; jetpack; big_frying_pan;
+        |];
       epic = [| edible_clock; obfuscinator; reverse_jetpack |];
       undiscovered = [| chaos |];
     }
