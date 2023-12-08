@@ -3,7 +3,10 @@ module WB = TypeGame.Game.WordBag
 module ItemTester = TypeGame.Items
 module IBag = ItemTester.ArrayItemBag
 module StateTester = TypeGame.State
-module Gam = StateTester.HardGameMutable
+module GamHard = StateTester.HardGameMutable
+module GamEasy = StateTester.EasyGameMutable
+module GamExtreme = StateTester.ExtremeGameMutable
+module GamSudden = StateTester.SuddenDeathMutable
 
 (* [cmp_bag_like_lists lst1 lst2] compares two lists to see whether they are
    equivalent bag-like lists. That means checking that they they contain the
@@ -75,23 +78,71 @@ let join_tests =
 let item_tests =
   [
     ( "initialize_jetpack" >:: fun _ ->
-      Gam.initialize ();
+      GamHard.initialize ();
       ItemTester.jetpack_effect () "Hard";
-      assert_equal (Gam.health ()) 90 );
+      assert_equal (GamHard.health ()) 90 );
     ( "initialize_bloodAltar" >:: fun _ ->
-      Gam.initialize ();
+      GamHard.initialize ();
       ItemTester.bloody_altar_effect () "Hard";
-      assert_equal (Gam.health ()) 50 );
+      assert_equal (GamHard.health ()) 50 );
     ( "max_health + 5, losing health and changing level" >:: fun _ ->
-      Gam.initialize ();
+      GamHard.initialize ();
       ItemTester.banana_effect () "Hard";
-      assert_equal (Gam.health ()) 100;
+      assert_equal (GamHard.health ()) 100;
       ItemTester.jetpack_effect () "Hard";
-      assert_equal (Gam.health ()) 90;
-      assert_equal (Gam.cur_level ()) 1;
+      assert_equal (GamHard.health ()) 90;
+      assert_equal (GamHard.cur_level ()) 1;
       ItemTester.reverse_jetpack_effect () "Hard";
-      assert_equal (Gam.health ()) 80;
-      assert_equal (Gam.cur_level ()) 0 );
+      assert_equal (GamHard.health ()) 80;
+      assert_equal (GamHard.cur_level ()) 0 );
+    ( "0 health " >:: fun _ ->
+      GamEasy.initialize ();
+      ItemTester.bloody_altar_effect () "Easy";
+      assert_equal (GamEasy.health ()) 50;
+      assert_equal (GamEasy.time ()) 240;
+      ItemTester.bloody_altar_effect () "Easy";
+      assert_equal (GamEasy.health ()) 25;
+      ItemTester.jetpack_effect () "Easy";
+      assert_equal (GamEasy.health ()) 15;
+      assert_equal (GamEasy.cur_level ()) 1;
+      ItemTester.jetpack_effect () "Easy";
+      assert_equal (GamEasy.health ()) 5;
+      assert_equal (GamEasy.cur_level ()) 2;
+      ItemTester.jetpack_effect () "Easy";
+      assert_equal (GamEasy.health ()) ~-5;
+      assert_equal (GamEasy.cur_level ()) 3 );
+    ( "too much health " >:: fun _ ->
+      GamExtreme.initialize ();
+      ItemTester.edible_clock_effect () "Extreme";
+      assert_equal (GamExtreme.health ()) 50;
+      assert_equal (GamExtreme.time ()) 70;
+      ItemTester.edible_clock_effect () "Extreme";
+      assert_equal (GamExtreme.health ()) 50;
+      assert_equal (GamExtreme.time ()) 80;
+      ItemTester.edible_clock_effect () "Extreme";
+      assert_equal (GamExtreme.health ()) 50;
+      assert_equal (GamExtreme.time ()) 90;
+      ItemTester.obfuscinator_effect () "Extreme";
+      print_endline (string_of_int (GamExtreme.health ()) ^ "im dead");
+      assert_equal (GamExtreme.time ()) 50;
+      assert_equal (GamExtreme.health ()) 50 );
+    ( "dropping time " >:: fun _ ->
+      GamSudden.initialize ();
+      ItemTester.forgotton_altar_effect () "Sudden Death";
+      assert_equal (GamSudden.health ()) 100;
+      assert_equal (GamSudden.time ()) 45;
+      ItemTester.forgotton_altar_effect () "Sudden Death";
+      assert_equal (GamSudden.health ()) 100;
+      assert_equal (GamSudden.time ()) 22;
+      ItemTester.forgotton_altar_effect () "Sudden Death";
+      assert_equal (GamSudden.health ()) 100;
+      assert_equal (GamSudden.time ()) 11;
+      ItemTester.forgotton_altar_effect () "Sudden Death";
+      assert_equal (GamSudden.health ()) 100;
+      assert_equal (GamSudden.time ()) 5;
+      ItemTester.broken_clock_effect () "Sudden Death";
+      assert_equal (GamSudden.health ()) 100;
+      assert_equal (GamSudden.time ()) 15 );
   ]
 
 let test_list = to_list_tests @ of_list_tests @ join_tests @ item_tests
