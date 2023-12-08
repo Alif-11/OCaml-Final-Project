@@ -135,6 +135,8 @@ let round_tick start_time time_allotted (state : round_state) =
   let time_passed =
     int_of_float (Float.round ((cur_time -. start_time) *. 100.0))
   in
+  print_string (string_of_int time_passed ^ " " ^ string_of_int time_allotted);
+  print_newline ();
   let frac_sec = time_passed mod 100 in
   let string_frac_sec =
     if frac_sec < 10 then "0" ^ string_of_int frac_sec
@@ -153,7 +155,15 @@ let round_tick start_time time_allotted (state : round_state) =
   Graphics.fill_rect 100 900 100 30;
   Graphics.set_color Graphics.black;
   Graphics.draw_string time_string;
-  if time_passed >= time_allotted then { state with fin = true }
+  if time_passed >= time_allotted then (
+    Graphics.moveto 100 100;
+    Graphics.draw_string "You've run out of time. Press <ENTER> to continue.";
+    let cont = ref false in
+    while !cont = false do
+      if Graphics.key_pressed () then
+        if Graphics.read_key () = Char.chr 13 then cont := true
+    done;
+    { state with fin = true })
   else
     let x_pos = fst state.pos in
     let y_pos = snd state.pos in
@@ -231,11 +241,12 @@ let item_select gm =
         new_line (1000, Graphics.current_y ());
         print_items (n + 1) t
   in
-  Graphics.moveto 100 800;
+  Graphics.moveto 100 900;
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
   Graphics.set_color Graphics.black;
   Graphics.draw_string "Choose an item:";
+  new_line (1000, Graphics.current_y ());
   new_line (1000, Graphics.current_y ());
   print_items 1 item_list;
   let item_chosen = ref false in
@@ -270,7 +281,7 @@ let item_select gm =
   ()
 
 let round gm =
-  Graphics.moveto 100 800;
+  Graphics.moveto 100 900;
   let word_list =
     Game.generate_sequence
       (Game.word_bag_t (game_get_difficulty gm))
@@ -287,12 +298,13 @@ let round gm =
   let start_time = Unix.gettimeofday () in
   let finished = ref false in
   Graphics.set_color Graphics.black;
-  Graphics.moveto 100 800;
+  Graphics.moveto 100 900;
   Graphics.draw_string
     ("-" ^ gm ^ " LEVEL " ^ string_of_int (game_get_cur_level gm) ^ "-");
-  Graphics.moveto 100 775;
+  new_line (1000, Graphics.current_y ());
+  new_line (1000, Graphics.current_y ());
   Graphics.draw_string "This round you will have:";
-  Graphics.moveto 100 750;
+  new_line (1000, Graphics.current_y ());
   Graphics.draw_string
     (string_of_int (game_get_num_words gm)
     ^ " words in "
@@ -304,7 +316,7 @@ let round gm =
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
   Graphics.set_color Graphics.black;
-  Graphics.moveto 100 850;
+  Graphics.moveto 100 875;
   Graphics.draw_string
     ("[Current Health: " ^ string_of_int (game_get_health gm) ^ "] ");
   Graphics.draw_string
@@ -313,10 +325,10 @@ let round gm =
     ("[Total Seconds Allowed This Level: "
     ^ string_of_int (game_get_time gm)
     ^ "] ");
-  Graphics.moveto 100 800;
+  Graphics.moveto 100 825;
   print_words word_list;
-  new_line (1000, snd (Graphics.current_point ()));
-  new_line (1000, snd (Graphics.current_point ()));
+  new_line (1000, Graphics.current_y ());
+  new_line (1000, Graphics.current_y ());
   let rs_tick =
     ref
       {
@@ -332,7 +344,7 @@ let round gm =
   in
   while !finished = false do
     Unix.sleepf 0.001;
-    rs_tick := round_tick start_time 6000 !rs_tick;
+    rs_tick := round_tick start_time (game_get_time gm * 100) !rs_tick;
     finished := !rs_tick.fin
   done;
   let cur_time = Unix.gettimeofday () in
@@ -343,15 +355,15 @@ let round gm =
   let hp =
     game_health_lost gm (time_given - time_passed) !rs_tick.wrong words_left
   in
-  print_string (string_of_int (game_get_health gm));
-  print_newline ();
   item_select gm;
-  print_string (string_of_int (game_get_health gm));
-  print_newline ();
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
   Graphics.set_color Graphics.black;
-  Graphics.moveto 100 800;
+  Graphics.moveto 100 900;
+  Graphics.draw_string
+    (gm ^ " Level " ^ string_of_int (game_get_cur_level gm) ^ " Results :");
+  new_line (1000, Graphics.current_y ());
+  new_line (1000, Graphics.current_y ());
   let accuracy = !rs_tick.right * 100 / words_given in
   Graphics.draw_string
     ("Your accuracy was " ^ string_of_int accuracy ^ "% with "
@@ -359,17 +371,15 @@ let round gm =
     ^ " words typed correctly and "
     ^ string_of_int !rs_tick.wrong
     ^ " words typed incorrectly out of " ^ string_of_int words_given
-    ^ " words total.");
+    ^ " words given.");
   let health_lost_string =
     if fst hp = 0 then " (no health lost)"
-    else " (" ^ string_of_int (fst hp) ^ " health)"
+    else " (-" ^ string_of_int (fst hp) ^ " health)"
   in
   Graphics.draw_string health_lost_string;
   let score_gain = game_add_score gm !rs_tick.right in
   let cur_health = game_get_health gm in
-  print_string (string_of_int (game_get_health gm));
-  print_newline ();
-  Graphics.moveto 100 775;
+  new_line (1000, Graphics.current_y ());
   Graphics.draw_string
     ("You also used up " ^ string_of_int time_passed ^ " seconds out of "
     ^ string_of_int (game_get_time gm)
@@ -379,16 +389,18 @@ let round gm =
     else " (+ " ^ string_of_int (snd hp) ^ " health)"
   in
   Graphics.draw_string health_gained_string;
-  Graphics.moveto 100 750;
+  new_line (1000, Graphics.current_y ());
+  Graphics.draw_string "With item effects:";
+  new_line (1000, Graphics.current_y ());
   Graphics.draw_string
     ("You are now at "
     ^ string_of_int (game_get_health gm)
     ^ "/"
     ^ string_of_int (game_get_max_health gm)
     ^ " health");
-  Graphics.moveto 100 725;
+  new_line (1000, Graphics.current_y ());
   Graphics.draw_string "Here's what you got wrong: ";
-  Graphics.moveto 100 700;
+  new_line (1000, Graphics.current_y ());
   let rec diffs_to_strings (diffs : (string * string) list) (acc : string list)
       =
     match diffs with
@@ -425,20 +437,21 @@ let round gm =
 let () =
   (*Game initialization*)
   Graphics.open_graph " 1000x1000+0+0";
-  Graphics.moveto 100 800;
+  Graphics.moveto 100 900;
   Graphics.set_color Graphics.black;
   Graphics.draw_string "Rules : ";
-  Graphics.moveto 100 775;
+  new_line (1000, Graphics.current_y ());
+  new_line (1000, Graphics.current_y ());
   Graphics.draw_string "1. You lose health for getting words wrong";
-  Graphics.moveto 100 750;
+  new_line (1000, Graphics.current_y ());
   Graphics.draw_string
     "2. Once you press space, we consider that a new word! You can't go back \
      to fix your mistakes :)";
-  Graphics.moveto 100 725;
+  new_line (1000, Graphics.current_y ());
   Graphics.draw_string
     "3. If you don't finish, then any words left over will also cost you some \
      health :)";
-  Graphics.moveto 100 700;
+  new_line (1000, Graphics.current_y ());
   Graphics.draw_string
     "4. Press <ENTER> if you finish early. If you have time left over, you \
      might regain some health :)";
@@ -448,8 +461,9 @@ let () =
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
   Graphics.set_color Graphics.black;
-  Graphics.moveto 100 800;
+  Graphics.moveto 100 900;
   Graphics.draw_string "CHOOSE A GAME MODE:";
+  new_line (1000, Graphics.current_y ());
   new_line (1000, Graphics.current_y ());
   Graphics.set_color Graphics.green;
   Graphics.draw_string "1 : Easy - More time, Less Hurt";
