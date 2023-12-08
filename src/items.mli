@@ -30,6 +30,9 @@ val forgotton_altar_effect : unit -> string -> unit
 (* The effect of the Bloody Altar (* less ominous music plays *). *)
 val bloody_altar_effect : unit -> string -> unit
 
+(* Swaps your health and your time. *)
+val obfuscinator_effect : unit -> string -> unit
+
 (* Sends you up one level at the cost of 10 health. *)
 val jetpack_effect : unit -> string -> unit
 
@@ -46,6 +49,9 @@ val word_eviscer_inator_effect : unit -> string -> unit
 (* An unfortunate encounter. Reduces max health by current health, then sets
    your current health to that difference. *)
 val black_cat_trinket_effect : unit -> string -> unit
+
+(* Halves your current level. *)
+val regression_stone_effect : unit -> string -> unit
 
 (* The signature for the module that randomly selects an item. *)
 module type ItemBag = sig

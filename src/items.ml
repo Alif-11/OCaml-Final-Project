@@ -14,6 +14,7 @@ type name =
   | BigFryingPan
   | WordEviscerInator
   | BlackCatTrinket
+  | RegressionStone
 
 type rarity =
   | Common
@@ -458,6 +459,65 @@ let black_cat_trinket : item =
     [ "??? h*a*th" ],
     black_cat_trinket_effect )
 
+let regression_stone_effect () (mode : string) =
+  if mode = "Easy" then (
+    let tmp = EasyGameMutable.cur_level () in
+    EasyGameMutable._cur_level := EasyGameMutable.cur_level () / 2;
+    let i = ref 1 in
+    while !i < tmp - EasyGameMutable.cur_level () do
+      EasyGameMutable.decrement_level ();
+      i := !i + 1
+    done)
+  else if mode = "Normal" then (
+    let tmp = NormalGameMutable.cur_level () in
+    NormalGameMutable._cur_level := NormalGameMutable.cur_level () / 2;
+    let i = ref 1 in
+    while !i < tmp - NormalGameMutable.cur_level () do
+      NormalGameMutable.decrement_level ();
+      i := !i + 1
+    done)
+  else if mode = "Hard" then (
+    let tmp = HardGameMutable.cur_level () in
+    HardGameMutable._cur_level := HardGameMutable.cur_level () / 2;
+    let i = ref 1 in
+    while !i < tmp - HardGameMutable.cur_level () do
+      HardGameMutable.decrement_level ();
+      i := !i + 1
+    done)
+  else if mode = "Extreme" then (
+    let tmp = ExtremeGameMutable.cur_level () in
+    ExtremeGameMutable._cur_level := ExtremeGameMutable.cur_level () / 2;
+    let i = ref 1 in
+    while !i < tmp - ExtremeGameMutable.cur_level () do
+      ExtremeGameMutable.decrement_level ();
+      i := !i + 1
+    done)
+  else if mode = "Sudden Death" then (
+    let tmp = SuddenDeathMutable.cur_level () in
+    SuddenDeathMutable._cur_level := SuddenDeathMutable.cur_level () / 2;
+    let i = ref 1 in
+    while !i < tmp - SuddenDeathMutable.cur_level () do
+      SuddenDeathMutable.decrement_level ();
+      i := !i + 1
+    done)
+  else if mode = "Chaos" then (
+    let tmp = ChaosGameMutable.cur_level () in
+    ChaosGameMutable._cur_level := ChaosGameMutable.cur_level () / 2;
+    let i = ref 1 in
+    while !i < tmp - ChaosGameMutable.cur_level () do
+      ChaosGameMutable.decrement_level ();
+      i := !i + 1
+    done)
+  else failwith "Item cringe"
+
+let regression_stone : item =
+  ( RegressionStone,
+    Epic,
+    "Glowing Blue Rock",
+    "As you peer into it, you start seeing glimpses of the past...",
+    [ "-??? Levels" ],
+    regression_stone_effect )
+
 module type ItemBag = sig
   type items
 
@@ -480,7 +540,13 @@ module ArrayItemBag : ItemBag = struct
           broken_clock; forgotton_altar; bloody_altar; jetpack; big_frying_pan;
         |];
       epic =
-        [| edible_clock; obfuscinator; reverse_jetpack; word_eviscer_inator |];
+        [|
+          edible_clock;
+          obfuscinator;
+          reverse_jetpack;
+          word_eviscer_inator;
+          regression_stone;
+        |];
       undiscovered = [| chaos; black_cat_trinket |];
     }
 
@@ -553,6 +619,7 @@ let effect_to_string (item : item) =
         "You have 4 less words to deal with in the next round.";
       ]
   | BlackCatTrinket -> [ "You were warned..." ]
+  | RegressionStone -> [ "Shwoop da woop! You were sent back in time." ]
 
 let flavor_to_string (item : item) =
   let _, _, _, f, _, _ = item in
