@@ -68,7 +68,7 @@ let chaos_effect () =
     NormalGameMutable._health := 1;
     NormalGameMutable._time := 60)
   else (
-    NormalGameMutable._health := 250;
+    NormalGameMutable._health := NormalGameMutable.max_health ();
     NormalGameMutable._time := 90)
 
 let chaos : item =
