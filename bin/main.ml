@@ -11,6 +11,120 @@ type round_state = {
   mutable differences : (string * string) list;
 }
 
+(**Given a string representing the game mode, **)
+let game_get_time gm =
+  if gm = "Easy" then State.EasyGameMutable.time ()
+  else if gm = "Normal" then State.NormalGameMutable.time ()
+  else if gm = "Hard" then State.HardGameMutable.time ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.time ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.time ()
+  else if gm = "Chaos" then State.ChaosGameMutable.time ()
+  else failwith "cringe"
+
+let game_get_num_words gm =
+  if gm = "Easy" then State.EasyGameMutable.num_words ()
+  else if gm = "Normal" then State.NormalGameMutable.num_words ()
+  else if gm = "Hard" then State.HardGameMutable.num_words ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.num_words ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.num_words ()
+  else if gm = "Chaos" then State.ChaosGameMutable.num_words ()
+  else failwith "cringe"
+
+let game_get_difficulty gm =
+  if gm = "Easy" then State.EasyGameMutable.difficulty ()
+  else if gm = "Normal" then State.NormalGameMutable.difficulty ()
+  else if gm = "Hard" then State.HardGameMutable.difficulty ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.difficulty ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.difficulty ()
+  else if gm = "Chaos" then State.ChaosGameMutable.difficulty ()
+  else failwith "cringe"
+
+let game_get_health gm =
+  if gm = "Easy" then State.EasyGameMutable.health ()
+  else if gm = "Normal" then State.NormalGameMutable.health ()
+  else if gm = "Hard" then State.HardGameMutable.health ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.health ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.health ()
+  else if gm = "Chaos" then State.ChaosGameMutable.health ()
+  else failwith "cringe"
+
+let game_get_max_health gm =
+  if gm = "Easy" then State.EasyGameMutable.max_health ()
+  else if gm = "Normal" then State.NormalGameMutable.max_health ()
+  else if gm = "Hard" then State.HardGameMutable.max_health ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.max_health ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.max_health ()
+  else if gm = "Chaos" then State.ChaosGameMutable.max_health ()
+  else failwith "cringe"
+
+let game_get_cur_level gm =
+  if gm = "Easy" then State.EasyGameMutable.cur_level ()
+  else if gm = "Normal" then State.NormalGameMutable.cur_level ()
+  else if gm = "Hard" then State.HardGameMutable.cur_level ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.cur_level ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.cur_level ()
+  else if gm = "Chaos" then State.ChaosGameMutable.cur_level ()
+  else failwith "cringe"
+
+let game_get_score gm =
+  if gm = "Easy" then State.EasyGameMutable.score ()
+  else if gm = "Normal" then State.NormalGameMutable.score ()
+  else if gm = "Hard" then State.HardGameMutable.score ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.score ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.score ()
+  else if gm = "Chaos" then State.ChaosGameMutable.score ()
+  else failwith "cringe"
+
+let game_get_num_items gm =
+  if gm = "Easy" then State.EasyGameMutable.num_items ()
+  else if gm = "Normal" then State.NormalGameMutable.num_items ()
+  else if gm = "Hard" then State.HardGameMutable.num_items ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.num_items ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.num_items ()
+  else if gm = "Chaos" then State.ChaosGameMutable.num_items ()
+  else failwith "cringe"
+
+let game_health_lost gm time wrong remaining =
+  if gm = "Easy" then State.EasyGameMutable.health_lost time wrong remaining
+  else if gm = "Normal" then
+    State.NormalGameMutable.health_lost time wrong remaining
+  else if gm = "Hard" then
+    State.HardGameMutable.health_lost time wrong remaining
+  else if gm = "Extreme" then
+    State.ExtremeGameMutable.health_lost time wrong remaining
+  else if gm = "Sudden Death" then
+    State.SuddenDeathMutable.health_lost time wrong remaining
+  else if gm = "Chaos" then
+    State.ChaosGameMutable.health_lost time wrong remaining
+  else failwith "cringe"
+
+let game_adjust_level gm =
+  if gm = "Easy" then State.EasyGameMutable.adjust_level ()
+  else if gm = "Normal" then State.NormalGameMutable.adjust_level ()
+  else if gm = "Hard" then State.HardGameMutable.adjust_level ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.adjust_level ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.adjust_level ()
+  else if gm = "Chaos" then State.ChaosGameMutable.adjust_level ()
+  else failwith "cringe"
+
+let game_add_score gm right =
+  if gm = "Easy" then State.EasyGameMutable.add_score right
+  else if gm = "Normal" then State.NormalGameMutable.add_score right
+  else if gm = "Hard" then State.HardGameMutable.add_score right
+  else if gm = "Extreme" then State.ExtremeGameMutable.add_score right
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.add_score right
+  else if gm = "Chaos" then State.ChaosGameMutable.add_score right
+  else failwith "cringe"
+
+let game_initialize gm =
+  if gm = "Easy" then State.EasyGameMutable.initialize ()
+  else if gm = "Normal" then State.NormalGameMutable.initialize ()
+  else if gm = "Hard" then State.HardGameMutable.initialize ()
+  else if gm = "Extreme" then State.ExtremeGameMutable.initialize ()
+  else if gm = "Sudden Death" then State.SuddenDeathMutable.initialize ()
+  else if gm = "Chaos" then State.ChaosGameMutable.initialize ()
+  else failwith "cringe"
+
 (*for keeping spacing relatively consistent*)
 let new_line = function
   | x, y -> if x < 800 then () else Graphics.moveto 100 (y - 25)
@@ -88,12 +202,12 @@ let round_tick start_time time_allotted (state : round_state) =
         else state
     | false -> state
 
-let item_select () =
+let item_select gm =
   let rec item_gen n acc =
     if n = 0 then acc
     else item_gen (n - 1) (Items.ArrayItemBag.obtain_item () :: acc)
   in
-  let item_list = item_gen (State.NormalGameMutable.num_items ()) [] in
+  let item_list = item_gen (game_get_num_items gm) [] in
   let rec draw_list_spaced stat_list =
     match stat_list with
     | [] -> ()
@@ -132,7 +246,7 @@ let item_select () =
       if ascii_key >= 48 && ascii_key <= 57 then (
         let item_num_string = String.make 1 key in
         let item_num = int_of_string item_num_string in
-        if item_num > 0 && item_num <= State.NormalGameMutable.num_items () then (
+        if item_num > 0 && item_num <= game_get_num_items gm then (
           let chosen_item = List.nth item_list (item_num - 1) in
           Graphics.draw_string
             ("You've chosen item " ^ item_num_string ^ ": "
@@ -155,12 +269,12 @@ let item_select () =
   done;
   ()
 
-let round gs =
+let round gm =
   Graphics.moveto 100 800;
   let word_list =
     Game.generate_sequence
-      (Game.word_bag_t (State.NormalGameMutable.difficulty gs))
-      (State.NormalGameMutable.num_words gs)
+      (Game.word_bag_t (game_get_difficulty gm))
+      (game_get_num_words gm)
   in
   let words_given = List.length word_list in
   let rec print_words = function
@@ -174,15 +288,14 @@ let round gs =
   let finished = ref false in
   Graphics.set_color Graphics.black;
   Graphics.moveto 100 800;
-  Graphics.draw_string
-    ("-LEVEL " ^ string_of_int (State.NormalGameMutable.cur_level ()) ^ "-");
+  Graphics.draw_string ("-LEVEL " ^ string_of_int (game_get_cur_level gm) ^ "-");
   Graphics.moveto 100 775;
   Graphics.draw_string "This round you will have:";
   Graphics.moveto 100 750;
   Graphics.draw_string
-    (string_of_int (State.NormalGameMutable.num_words ())
+    (string_of_int (game_get_num_words gm)
     ^ " words in "
-    ^ string_of_int (State.NormalGameMutable.time ())
+    ^ string_of_int (game_get_time gm)
     ^ " seconds.");
   Graphics.moveto 100 100;
   Graphics.draw_string "Are you ready? <PRESS ANY KEY TO START ROUND>";
@@ -192,16 +305,12 @@ let round gs =
   Graphics.set_color Graphics.black;
   Graphics.moveto 100 850;
   Graphics.draw_string
-    ("[Current Health: "
-    ^ string_of_int (State.NormalGameMutable.health ())
-    ^ "] ");
+    ("[Current Health: " ^ string_of_int (game_get_health gm) ^ "] ");
   Graphics.draw_string
-    ("[Current Score: "
-    ^ string_of_int (State.NormalGameMutable.score ())
-    ^ "] ");
+    ("[Current Score: " ^ string_of_int (game_get_score gm) ^ "] ");
   Graphics.draw_string
     ("[Total Seconds Allowed This Level: "
-    ^ string_of_int (State.NormalGameMutable.time ())
+    ^ string_of_int (game_get_time gm)
     ^ "] ");
   Graphics.moveto 100 800;
   print_words word_list;
@@ -227,9 +336,9 @@ let round gs =
   done;
   let cur_time = Unix.gettimeofday () in
   let time_passed = int_of_float (Float.round (cur_time -. start_time)) in
-  let time_given = State.NormalGameMutable.time () in
+  let time_given = game_get_time gm in
   Unix.sleepf 1.0;
-  item_select ();
+  item_select gm;
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
   Graphics.set_color Graphics.black;
@@ -242,34 +351,36 @@ let round gs =
     ^ string_of_int !rs_tick.wrong
     ^ " words typed incorrectly out of " ^ string_of_int words_given
     ^ " words total.");
+  let words_left = Int.abs words_given - !rs_tick.typed in
+  let hp =
+    game_health_lost gm (time_given - time_passed) !rs_tick.wrong words_left
+  in
   let health_lost_string =
-    if !rs_tick.wrong = 0 then " (no health lost)"
-    else
-      let temp = (!rs_tick.wrong + List.length !rs_tick.words) * 5 in
-      " (- " ^ string_of_int temp ^ " health)"
+    if fst hp = 0 then " (no health lost)"
+    else " (- " ^ string_of_int (fst hp) ^ " health)"
   in
   Graphics.draw_string health_lost_string;
-  let words_left = Int.abs words_given - !rs_tick.typed in
-  State.NormalGameMutable.health_lost (time_given - time_passed) !rs_tick.wrong
-    words_left;
-  State.NormalGameMutable.add_score !rs_tick.right;
-  let cur_health = State.NormalGameMutable.health () in
-  print_string (string_of_int (State.NormalGameMutable.health ()));
+  let score_gain = game_add_score gm !rs_tick.right in
+  let cur_health = game_get_health gm in
+  print_string (string_of_int (game_get_health gm));
   print_newline ();
   Graphics.moveto 100 775;
   Graphics.draw_string
     ("You also used up " ^ string_of_int time_passed ^ " seconds out of "
-   ^ string_of_int time_given ^ " seconds given.");
+    ^ string_of_int (game_get_time gm)
+    ^ " seconds given.");
   let health_gained_string =
-    if (time_given - time_passed) / 5 = 0 then " (no health gained)"
-    else
-      let temp = (time_given - time_passed) / 5 in
-      " (+ " ^ string_of_int temp ^ " health)"
+    if snd hp = 0 then " (no health gained)"
+    else " (+ " ^ string_of_int (snd hp) ^ " health)"
   in
   Graphics.draw_string health_gained_string;
   Graphics.moveto 100 750;
   Graphics.draw_string
-    ("You are now at " ^ string_of_int cur_health ^ " health!");
+    ("You are now at "
+    ^ string_of_int (game_get_health gm)
+    ^ "/"
+    ^ string_of_int (game_get_max_health gm)
+    ^ " health");
   Graphics.moveto 100 725;
   Graphics.draw_string "Here's what you got wrong: ";
   Graphics.moveto 100 700;
@@ -294,17 +405,16 @@ let round gs =
   let pos = Graphics.current_point () in
   new_line (1000, snd pos);
   if cur_health > 0 then (
+    Graphics.draw_string ("You gained " ^ string_of_int score_gain ^ " points!");
+    new_line (1000, Graphics.current_y ());
     Graphics.draw_string
-      ("Your current score is "
-      ^ string_of_int !State.NormalGameMutable._score
-      ^ ".");
+      ("Your current score is " ^ string_of_int (game_get_score gm) ^ ".");
     true)
   else (
     Graphics.draw_string "You died! Better luck next time.";
     new_line (1000, Graphics.current_y ());
     Graphics.draw_string
-      ("Your final score was "
-      ^ string_of_int (State.NormalGameMutable.score ()));
+      ("Your final score was " ^ string_of_int (game_get_score gm));
     false)
 
 let () =
@@ -332,15 +442,16 @@ let () =
   ignore (Graphics.wait_next_event [ Key_pressed ]);
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
-  let gs = ref (State.NormalGameMutable.initialize ()) in
+  (*TODO: ADD GAME MODE SELECTION HERE DIMWIT :)*)
+  game_initialize "Normal";
   let playing = ref true in
   (*Game loop*)
   while !playing do
-    playing := round !gs;
+    playing := round "Normal";
     Graphics.moveto 100 100;
     Graphics.draw_string "<PRESS ANY KEY TO CONTINUE>";
     ignore (Graphics.wait_next_event [ Key_pressed ]);
-    State.NormalGameMutable.adjust_level ();
+    game_adjust_level "Normal";
     Graphics.set_color Graphics.white;
     Graphics.fill_rect 0 0 1000 1000
   done

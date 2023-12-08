@@ -38,7 +38,7 @@ module type GameStateMutable = sig
   val num_items : unit -> int
   (** Number of items generated each time*)
 
-  val health_lost : int -> int -> int -> unit
+  val health_lost : int -> int -> int -> int * int
   (** Calculates health lost given time remaining, words wrong and words
       remaining *)
 
@@ -48,8 +48,13 @@ module type GameStateMutable = sig
   val decrement_level : unit -> unit
   (** Decrease level *)
 
-  val add_score : int -> unit
+  val add_score : int -> int
   (** add score based on number of correct words as passed in*)
 end
 
 module NormalGameMutable : GameStateMutable
+module EasyGameMutable : GameStateMutable
+module HardGameMutable : GameStateMutable
+module ExtremeGameMutable : GameStateMutable
+module SuddenDeathMutable : GameStateMutable
+module ChaosGameMutable : GameStateMutable
