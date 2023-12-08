@@ -288,7 +288,8 @@ let round gm =
   let finished = ref false in
   Graphics.set_color Graphics.black;
   Graphics.moveto 100 800;
-  Graphics.draw_string ("-LEVEL " ^ string_of_int (game_get_cur_level gm) ^ "-");
+  Graphics.draw_string
+    ("-" ^ gm ^ " LEVEL " ^ string_of_int (game_get_cur_level gm) ^ "-");
   Graphics.moveto 100 775;
   Graphics.draw_string "This round you will have:";
   Graphics.moveto 100 750;
@@ -446,16 +447,57 @@ let () =
   ignore (Graphics.wait_next_event [ Key_pressed ]);
   Graphics.set_color Graphics.white;
   Graphics.fill_rect 0 0 1000 1000;
-  (*TODO: ADD GAME MODE SELECTION HERE DIMWIT :)*)
-  game_initialize "Normal";
+  Graphics.set_color Graphics.black;
+  Graphics.moveto 100 800;
+  Graphics.draw_string "CHOOSE A GAME MODE:";
+  new_line (1000, Graphics.current_y ());
+  Graphics.set_color Graphics.green;
+  Graphics.draw_string "1 : Easy - More time, Less Hurt";
+  new_line (1000, Graphics.current_y ());
+  Graphics.set_color Graphics.black;
+  Graphics.draw_string "2 : Normal";
+  new_line (1000, Graphics.current_y ());
+  Graphics.draw_string "3 : Hard - Less time, More hurt";
+  new_line (1000, Graphics.current_y ());
+  Graphics.draw_string "4 : Extreme - Even Less time, Even more hurt";
+  new_line (1000, Graphics.current_y ());
+  Graphics.set_color Graphics.red;
+  Graphics.draw_string "5 : Sudden Death - One mistakes and you die";
+  new_line (1000, Graphics.current_y ());
+  Graphics.set_color Graphics.magenta;
+  Graphics.draw_string "6 : Chaos - Heheheha";
+  new_line (1000, Graphics.current_y ());
+  Graphics.set_color Graphics.black;
+  let gm =
+    let gm_chosen = ref "" in
+    while !gm_chosen = "" do
+      if Graphics.key_pressed () then
+        let key_char = Graphics.read_key () in
+        let ascii_key = Char.code key_char in
+        if ascii_key >= 48 && ascii_key <= 57 then
+          let gm_num_string = String.make 1 key_char in
+          let gm_num = int_of_string gm_num_string in
+          if gm_num = 1 then gm_chosen := "Easy"
+          else if gm_num = 2 then gm_chosen := "Normal"
+          else if gm_num = 3 then gm_chosen := "Hard"
+          else if gm_num = 4 then gm_chosen := "Extreme"
+          else if gm_num = 5 then gm_chosen := "Sudden Death"
+          else if gm_num = 6 then gm_chosen := "Chaos"
+    done;
+    Graphics.set_color Graphics.white;
+    Graphics.fill_rect 0 0 1000 1000;
+    Graphics.set_color Graphics.black;
+    !gm_chosen
+  in
+  game_initialize gm;
   let playing = ref true in
   (*Game loop*)
   while !playing do
-    playing := round "Normal";
+    playing := round gm;
     Graphics.moveto 100 100;
     Graphics.draw_string "<PRESS ANY KEY TO CONTINUE>";
     ignore (Graphics.wait_next_event [ Key_pressed ]);
-    game_adjust_level "Normal";
+    game_adjust_level gm;
     Graphics.set_color Graphics.white;
     Graphics.fill_rect 0 0 1000 1000
   done
