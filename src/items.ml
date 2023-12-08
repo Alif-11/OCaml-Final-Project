@@ -12,6 +12,7 @@ type name =
   | Jetpack
   | ReverseJetpack
   | BigFryingPan
+  | WordEviscerInator
 
 type rarity =
   | Common
@@ -100,22 +101,28 @@ let broken_clock : item =
 let edible_clock_effect () (mode : string) =
   if mode = "Easy" then (
     EasyGameMutable._time := EasyGameMutable.time () + 10;
-    EasyGameMutable._health := EasyGameMutable.health () + 15)
+    EasyGameMutable._health :=
+      min (EasyGameMutable.health () + 15) (EasyGameMutable.max_health ()))
   else if mode = "Normal" then (
     NormalGameMutable._time := NormalGameMutable.time () + 10;
-    NormalGameMutable._health := NormalGameMutable.health () + 15)
+    NormalGameMutable._health :=
+      min (NormalGameMutable.health () + 15) (NormalGameMutable.max_health ()))
   else if mode = "Hard" then (
     HardGameMutable._time := HardGameMutable.time () + 10;
-    HardGameMutable._health := HardGameMutable.health () + 15)
+    HardGameMutable._health :=
+      min (HardGameMutable.health () + 15) (HardGameMutable.max_health ()))
   else if mode = "Extreme" then (
     ExtremeGameMutable._time := ExtremeGameMutable.time () + 10;
-    ExtremeGameMutable._health := ExtremeGameMutable.health () + 15)
+    ExtremeGameMutable._health :=
+      min (ExtremeGameMutable.health () + 15) (ExtremeGameMutable.max_health ()))
   else if mode = "Sudden Death" then (
     SuddenDeathMutable._time := SuddenDeathMutable.time () + 10;
-    SuddenDeathMutable._health := SuddenDeathMutable.health () + 15)
+    SuddenDeathMutable._health :=
+      min (SuddenDeathMutable.health () + 15) (SuddenDeathMutable.max_health ()))
   else if mode = "Chaos" then (
     ChaosGameMutable._time := ChaosGameMutable.time () + 10;
-    ChaosGameMutable._health := ChaosGameMutable.health () + 15)
+    ChaosGameMutable._health :=
+      min (ChaosGameMutable.health () + 15) (ChaosGameMutable.max_health ()))
   else failwith "Item cringe"
 
 let edible_clock : item =
@@ -396,6 +403,31 @@ let big_frying_pan : item =
     [ "+5 Max HP (?)" ],
     big_frying_pan_effect )
 
+let word_eviscer_inator_effect () (mode : string) =
+  if mode = "Easy" then
+    EasyGameMutable._num_words := max (EasyGameMutable.num_words () - 4) 10
+  else if mode = "Normal" then
+    NormalGameMutable._num_words := max (NormalGameMutable.num_words () - 4) 10
+  else if mode = "Hard" then
+    HardGameMutable._num_words := max (HardGameMutable.num_words () - 4) 10
+  else if mode = "Extreme" then
+    ExtremeGameMutable._num_words :=
+      max (ExtremeGameMutable.num_words () - 4) 10
+  else if mode = "Sudden Death" then
+    SuddenDeathMutable._num_words :=
+      max (SuddenDeathMutable.num_words () - 4) 10
+  else if mode = "Chaos" then
+    ChaosGameMutable._num_words := max (ChaosGameMutable.num_words () - 4) 10
+  else failwith "Item cringe"
+
+let word_eviscer_inator : item =
+  ( WordEviscerInator,
+    Epic,
+    "Hungry Hungry Word Hippo",
+    "It's hungry for knowledge, and words are the easiest way to that!",
+    [ "-4 Number of Words" ],
+    word_eviscer_inator_effect )
+
 module type ItemBag = sig
   type items
 
@@ -417,7 +449,8 @@ module ArrayItemBag : ItemBag = struct
         [|
           broken_clock; forgotton_altar; bloody_altar; jetpack; big_frying_pan;
         |];
-      epic = [| edible_clock; obfuscinator; reverse_jetpack |];
+      epic =
+        [| edible_clock; obfuscinator; reverse_jetpack; word_eviscer_inator |];
       undiscovered = [| chaos |];
     }
 
@@ -485,6 +518,11 @@ let effect_to_string (item : item) =
         "You also went down a level!!!";
       ]
   | BigFryingPan -> [ "Haha! You lost 5 max health! Hahah!!" ]
+  | WordEviscerInator ->
+      [
+        "The hippo thanks you for the feast.";
+        "You have 4 less words to deal with in the next round.";
+      ]
 
 let flavor_to_string (item : item) =
   let _, _, _, f, _, _ = item in
