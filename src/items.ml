@@ -240,7 +240,7 @@ let bloody_altar : item =
     "This altar is overflowing with blood, but its pulsing for more. It seems \
      to want something from you...",
     [ "-? HP"; "+? Seconds" ],
-    forgotton_altar_effect )
+    bloody_altar_effect )
 
 let obfuscinator_effect () (mode : string) =
   if mode = "Easy" then (
