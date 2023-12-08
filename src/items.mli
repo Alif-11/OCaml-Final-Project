@@ -36,6 +36,10 @@ val jetpack_effect : unit -> string -> unit
 (* Sends you down one level at the cost of 10 health. *)
 val reverse_jetpack_effect : unit -> string -> unit
 
+(* Reduces your max health by 5. Sets health to the lower of the max health and
+   the current health. *)
+val big_frying_pan_effect : unit -> string -> unit
+
 (* The signature for the module that randomly selects an item. *)
 module type ItemBag = sig
   (* The data representation for pulling an item. *)
