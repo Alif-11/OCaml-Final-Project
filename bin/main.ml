@@ -254,7 +254,7 @@ let item_select gm =
             ^ "!");
           new_line (1000, Graphics.current_y ());
           draw_list_spaced (Items.effect_to_string chosen_item);
-          Items.apply_item chosen_item;
+          Items.apply_item chosen_item gm;
           new_line (1000, Graphics.current_y ());
           item_chosen := true;
           Graphics.draw_string "<PRESS ANY KEY TO CONTINUE>";
