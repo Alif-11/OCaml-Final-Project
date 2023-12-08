@@ -1,7 +1,7 @@
 open OUnit2
 module WB = TypeGame.Game.WordBag
 module ItemTester = TypeGame.Items
-module ItemBag = ItemTester.ArrayItemBag
+module IBag = ItemTester.ArrayItemBag
 module StateTester = TypeGame.State
 module Gam = StateTester.NormalGameMutable
 
@@ -78,6 +78,10 @@ let item_tests =
       Gam.initialize ();
       ItemTester.jetpack_effect ();
       assert_equal (Gam.health ()) 90 );
+    ( "initialize" >:: fun _ ->
+      Gam.initialize ();
+      ItemTester.bloody_altar_effect ();
+      assert_equal (Gam.health ()) 50 );
   ]
 
 let test_list = to_list_tests @ of_list_tests @ join_tests @ item_tests
