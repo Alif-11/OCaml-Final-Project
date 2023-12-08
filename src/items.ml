@@ -21,15 +21,15 @@ type rarity =
 type item = name * rarity * string * string * string list * (unit -> unit)
 
 let apple_effect () =
-  let hp = NormalGameMutable._health in
-  hp := !hp + 5
+  NormalGameMutable._health :=
+    min (NormalGameMutable.health () + 5) (NormalGameMutable.max_health ())
 
 let apple : item =
   (Apple, Common, "Banapple", "Tastes like a banana.", [ "+5 HP" ], apple_effect)
 
 let banana_effect () =
-  let hp = NormalGameMutable._health in
-  hp := !hp + 5
+  NormalGameMutable._health :=
+    min (NormalGameMutable.health () + 5) (NormalGameMutable.max_health ())
 
 let banana : item =
   ( Banana,
@@ -40,8 +40,8 @@ let banana : item =
     banana_effect )
 
 let broken_clock_effect () =
-  let time = NormalGameMutable._time in
-  time := !time + 10
+  NormalGameMutable._health :=
+    min (NormalGameMutable.health () + 10) (NormalGameMutable.max_health ())
 
 let broken_clock : item =
   ( BrokenClock,
@@ -52,10 +52,9 @@ let broken_clock : item =
     broken_clock_effect )
 
 let edible_clock_effect () =
-  let hp = NormalGameMutable._health in
-  let time = NormalGameMutable._time in
-  hp := !hp + 10;
-  time := !time + 15
+  NormalGameMutable._health :=
+    min (NormalGameMutable.health () + 10) (NormalGameMutable.max_health ());
+  NormalGameMutable._time := NormalGameMutable.time () + 15
 
 let edible_clock : item =
   ( EdibleClock,
@@ -66,23 +65,20 @@ let edible_clock : item =
     edible_clock_effect )
 
 let chaos_effect () =
-  let hp = NormalGameMutable._health in
-  let time = NormalGameMutable._time in
   if Random.int 2 = 0 then (
-    hp := 1;
-    time := 60)
+    NormalGameMutable._health := 1;
+    NormalGameMutable._time := 60)
   else (
-    hp := 250;
-    time := 90)
+    NormalGameMutable._health := 250;
+    NormalGameMutable._time := 90)
 
 let chaos : item =
   (Chaos, Undiscovered, "???", "Don't.", [ "???" ], chaos_effect)
 
 let forgotton_altar_effect () =
-  let hp = NormalGameMutable._health in
-  let time = NormalGameMutable._time in
-  time := !time / 2;
-  hp := !hp * 2
+  NormalGameMutable._time := NormalGameMutable.time () / 2;
+  NormalGameMutable._health :=
+    min (NormalGameMutable.health () * 2) (NormalGameMutable.max_health ())
 
 let forgotton_altar : item =
   ( ForgottenAltar,
@@ -94,10 +90,8 @@ let forgotton_altar : item =
     forgotton_altar_effect )
 
 let bloody_altar_effect () =
-  let hp = NormalGameMutable._health in
-  let time = NormalGameMutable._time in
-  time := !time * 2;
-  hp := !hp / 2
+  NormalGameMutable._time := NormalGameMutable.time () * 2;
+  NormalGameMutable._health := max (min (NormalGameMutable.health () / 2) 100) 1
 
 let bloody_altar : item =
   ( BloodyAltar,
@@ -109,11 +103,9 @@ let bloody_altar : item =
     forgotton_altar_effect )
 
 let obfuscinator_effect () =
-  let hp = NormalGameMutable._health in
-  let time = NormalGameMutable._time in
-  let tmp = !time in
-  time := !hp;
-  hp := tmp
+  let tmp = NormalGameMutable.time () in
+  NormalGameMutable._time := NormalGameMutable.health ();
+  NormalGameMutable._health := tmp
 
 let obfuscinator : item =
   ( Obfuscinator,
@@ -125,8 +117,7 @@ let obfuscinator : item =
     obfuscinator_effect )
 
 let jetpack_effect () =
-  let hp = NormalGameMutable._health in
-  hp := !hp - 10;
+  NormalGameMutable._health := NormalGameMutable.health () - 10;
   NormalGameMutable.adjust_level ()
 
 let jetpack : item =
@@ -138,8 +129,7 @@ let jetpack : item =
     jetpack_effect )
 
 let reverse_jetpack_effect () =
-  let hp = NormalGameMutable._health in
-  hp := !hp - 10;
+  NormalGameMutable._health := NormalGameMutable.health () - 10;
   NormalGameMutable.decrement_level ()
 
 let reverse_jetpack : item =

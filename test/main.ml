@@ -1,11 +1,14 @@
 open OUnit2
-
 module WB = TypeGame.Game.WordBag
+module ItemTester = TypeGame.Items
+module ItemBag = ItemTester.ArrayItemBag
+module StateTester = TypeGame.State
+module Gam = StateTester.NormalGameMutable
 
-(** [cmp_bag_like_lists lst1 lst2] compares two lists to see whether they are
-    equivalent bag-like lists. That means checking that they they contain the
-    same elements with the same number of repetitions, though not necessarily in
-    the same order. *)
+(* [cmp_bag_like_lists lst1 lst2] compares two lists to see whether they are
+   equivalent bag-like lists. That means checking that they they contain the
+   same elements with the same number of repetitions, though not necessarily in
+   the same order. *)
 let cmp_bag_like_lists lst1 lst2 =
   let sort1 = List.sort compare lst1 in
   let sort2 = List.sort compare lst2 in
@@ -69,7 +72,14 @@ let join_tests =
 
 (* TODO: add sample tests *)
 
-let word_bag_tests = to_list_tests @ of_list_tests @ join_tests
+let item_tests =
+  [
+    ( "initialize" >:: fun _ ->
+      Gam.initialize ();
+      ItemTester.jetpack_effect ();
+      assert_equal (Gam.health ()) 90 );
+  ]
 
-let tests = "test suite" >::: word_bag_tests
+let test_list = to_list_tests @ of_list_tests @ join_tests @ item_tests
+let tests = "test suite" >::: test_list
 let () = run_test_tt_main tests
