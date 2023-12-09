@@ -282,11 +282,13 @@ module SuddenDeathMutable : GameStateMutable = struct
   let health_lost time_left missed words_left =
     _health :=
       min
-        (!_health + (-missed * !_max_health)
-        - (words_left * !_max_health)
+        (!_health
+        + (-missed * !_max_health * 10)
+        - (words_left * !_max_health * 10)
         + (time_left / 10))
         (max_health ());
-    (0 - (missed * !_max_health) - (words_left * !_max_health), time_left)
+    ( 0 - (missed * !_max_health * 10) - (words_left * !_max_health * 10),
+      time_left / 10 )
 
   let adjust_level () =
     _cur_level := !_cur_level + 1;

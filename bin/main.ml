@@ -135,8 +135,6 @@ let round_tick start_time time_allotted (state : round_state) =
   let time_passed =
     int_of_float (Float.round ((cur_time -. start_time) *. 100.0))
   in
-  print_string (string_of_int time_passed ^ " " ^ string_of_int time_allotted);
-  print_newline ();
   let frac_sec = time_passed mod 100 in
   let string_frac_sec =
     if frac_sec < 10 then "0" ^ string_of_int frac_sec
@@ -377,7 +375,6 @@ let round gm =
     else " (-" ^ string_of_int (fst hp) ^ " health)"
   in
   Graphics.draw_string health_lost_string;
-  let score_gain = game_add_score gm !rs_tick.right in
   let cur_health = game_get_health gm in
   new_line (1000, Graphics.current_y ());
   Graphics.draw_string
@@ -422,6 +419,7 @@ let round gm =
   let pos = Graphics.current_point () in
   new_line (1000, snd pos);
   if cur_health > 0 then (
+    let score_gain = game_add_score gm !rs_tick.right in
     Graphics.draw_string ("You gained " ^ string_of_int score_gain ^ " points!");
     new_line (1000, Graphics.current_y ());
     Graphics.draw_string
