@@ -1,5 +1,5 @@
 open OUnit2
-module WB = TypeGame.Game.WordBag
+module WB = TypeGame.Words.WordBag
 module ItemTester = TypeGame.Items
 module IBag = ItemTester.ArrayItemBag
 module StateTester = TypeGame.State

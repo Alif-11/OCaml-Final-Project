@@ -281,8 +281,8 @@ let item_select gm =
 let round gm =
   Graphics.moveto 100 900;
   let word_list =
-    Game.generate_sequence
-      (Game.word_bag_t (game_get_difficulty gm))
+    Words.generate_sequence
+      (Words.word_bag_t (game_get_difficulty gm))
       (game_get_num_words gm)
   in
   let words_given = List.length word_list in
