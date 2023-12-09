@@ -80,6 +80,17 @@ let join_tests =
 (********************************************************************
   item tests
  ********************************************************************)
+let apple_tests =
+  [
+    ( "apple_effect" >:: fun _ ->
+      GamHard._health := 90;
+      ItemTester.apple_effect () "Hard";
+      assert_equal (GamHard.health ()) 95 );
+    ( "apple_effect max health" >:: fun _ ->
+      GamHard._health := 100;
+      ItemTester.apple_effect () "Hard";
+      assert_equal (GamHard.health ()) 100 );
+  ]
 
 let edge_tests =
   [
@@ -152,6 +163,6 @@ let edge_tests =
   ]
 
 let word_tests = to_list_tests @ of_list_tests @ join_tests
-let item_tests = edge_tests
+let item_tests = edge_tests @ apple_tests
 let tests = "test suite" >::: word_tests @ item_tests
 let () = run_test_tt_main tests
