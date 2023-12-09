@@ -143,10 +143,16 @@ let jet_pack_tests =
 
 let bloody_altar_tests =
   [
-    ( "initialize_bloodAltar" >:: fun _ ->
+    ( "bloody_altar_effect" >:: fun _ ->
+      GamHard.initialize ();
       ItemTester.bloody_altar_effect () "Hard";
-      assert_equal (GamHard.health ()) 50 ;
-      assert_equal (GamHard.health ()) 180 );
+      assert_equal (GamHard.health ()) 50;
+      assert_equal (GamHard.time ()) 180 );
+    ( "bloody_altar_effect 1 hp" >:: fun _ ->
+      GamHard._health := 1;
+      ItemTester.bloody_altar_effect () "Hard";
+      assert_equal (GamHard.health ()) 1;
+      assert_equal (GamHard.time ()) 180 );
   ]
 
 let edge_tests =
@@ -197,8 +203,8 @@ let edge_tests =
       assert_equal (GamExtreme.health ()) 50;
       assert_equal (GamExtreme.time ()) 105;
       ItemTester.obfuscinator_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 50 ;
-      assert_equal (GamExtreme.time ()) 50);
+      assert_equal (GamExtreme.health ()) 50;
+      assert_equal (GamExtreme.time ()) 50 );
     ( "dropping time " >:: fun _ ->
       GamSudden.initialize ();
       ItemTester.forgotton_altar_effect () "Sudden Death";
