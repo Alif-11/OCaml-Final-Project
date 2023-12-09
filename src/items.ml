@@ -1,3 +1,10 @@
+(*Because of a decision to structure our game state module more like a java
+  class, we do not have a type t and our variables are all bound to the original
+  instance of the class that was created. We did not realize that this would be
+  incompatible with functors (which return a new, separate instance of the game
+  state and thus do not have the variables at the same value). However, at the
+  point where we realized this issue, it would not have been worth the time and
+  effort to do a complete overhaul of the system*)
 open State
 
 type name =
