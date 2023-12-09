@@ -112,7 +112,41 @@ let broken_clock_tests =
       GamHard.initialize ();
       GamHard._time := 50;
       ItemTester.broken_clock_effect () "Hard";
-      assert_equal (GamHard.time ()) (60) );
+      assert_equal (GamHard.time ()) 60 );
+  ]
+
+let edible_clock_tests =
+  [
+    ( "edible_clock_effect" >:: fun _ ->
+      GamHard.initialize ();
+      GamHard._health := 50;
+      let initial_time = GamHard.time () in
+      ItemTester.edible_clock_effect () "Hard";
+      assert_equal (GamHard.health ()) 60;
+      assert_equal (GamHard.time ()) (initial_time + 15) );
+  ]
+
+let jet_pack_tests =
+  [
+    ( "jetpack_effect" >:: fun _ ->
+      GamHard.initialize ();
+      ItemTester.jetpack_effect () "Hard";
+      assert_equal (GamHard.health ()) 90;
+      assert_equal (GamHard.cur_level ()) 1 );
+    ( "reverse_jetpack_effect" >:: fun _ ->
+      GamHard.initialize ();
+      ItemTester.jetpack_effect () "Hard";
+      ItemTester.reverse_jetpack_effect () "Hard";
+      assert_equal (GamHard.health ()) 80;
+      assert_equal (GamHard.cur_level ()) 0 );
+  ]
+
+let bloody_altar_tests =
+  [
+    ( "initialize_bloodAltar" >:: fun _ ->
+      ItemTester.bloody_altar_effect () "Hard";
+      assert_equal (GamHard.health ()) 50 ;
+      assert_equal (GamHard.health ()) 180 );
   ]
 
 let edge_tests =
@@ -155,17 +189,16 @@ let edge_tests =
       GamExtreme.initialize ();
       ItemTester.edible_clock_effect () "Extreme";
       assert_equal (GamExtreme.health ()) 50;
-      assert_equal (GamExtreme.time ()) 70;
-      ItemTester.edible_clock_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 50;
-      assert_equal (GamExtreme.time ()) 80;
+      assert_equal (GamExtreme.time ()) 75;
       ItemTester.edible_clock_effect () "Extreme";
       assert_equal (GamExtreme.health ()) 50;
       assert_equal (GamExtreme.time ()) 90;
+      ItemTester.edible_clock_effect () "Extreme";
+      assert_equal (GamExtreme.health ()) 50;
+      assert_equal (GamExtreme.time ()) 105;
       ItemTester.obfuscinator_effect () "Extreme";
-      print_endline (string_of_int (GamExtreme.health ()) ^ "im dead");
-      assert_equal (GamExtreme.time ()) 50;
-      assert_equal (GamExtreme.health ()) 50 );
+      assert_equal (GamExtreme.health ()) 50 ;
+      assert_equal (GamExtreme.time ()) 50);
     ( "dropping time " >:: fun _ ->
       GamSudden.initialize ();
       ItemTester.forgotton_altar_effect () "Sudden Death";
@@ -186,6 +219,10 @@ let edge_tests =
   ]
 
 let word_tests = to_list_tests @ of_list_tests @ join_tests
-let item_tests = edge_tests @ apple_tests @ banana_tests @ broken_clock_tests
+
+let item_tests =
+  edge_tests @ apple_tests @ banana_tests @ broken_clock_tests
+  @ edible_clock_tests @ jet_pack_tests @ bloody_altar_tests
+
 let tests = "test suite" >::: word_tests @ item_tests
 let () = run_test_tt_main tests

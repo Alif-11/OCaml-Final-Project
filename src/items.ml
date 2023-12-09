@@ -109,29 +109,29 @@ let broken_clock : item =
 
 let edible_clock_effect () (mode : string) =
   if mode = "Easy" then (
-    EasyGameMutable._time := EasyGameMutable.time () + 10;
+    EasyGameMutable._time := EasyGameMutable.time () + 15;
     EasyGameMutable._health :=
-      min (EasyGameMutable.health () + 15) (EasyGameMutable.max_health ()))
+      min (EasyGameMutable.health () + 10) (EasyGameMutable.max_health ()))
   else if mode = "Normal" then (
-    NormalGameMutable._time := NormalGameMutable.time () + 10;
+    NormalGameMutable._time := NormalGameMutable.time () + 15;
     NormalGameMutable._health :=
-      min (NormalGameMutable.health () + 15) (NormalGameMutable.max_health ()))
+      min (NormalGameMutable.health () + 10) (NormalGameMutable.max_health ()))
   else if mode = "Hard" then (
-    HardGameMutable._time := HardGameMutable.time () + 10;
+    HardGameMutable._time := HardGameMutable.time () + 15;
     HardGameMutable._health :=
-      min (HardGameMutable.health () + 15) (HardGameMutable.max_health ()))
+      min (HardGameMutable.health () + 10) (HardGameMutable.max_health ()))
   else if mode = "Extreme" then (
-    ExtremeGameMutable._time := ExtremeGameMutable.time () + 10;
+    ExtremeGameMutable._time := ExtremeGameMutable.time () + 15;
     ExtremeGameMutable._health :=
-      min (ExtremeGameMutable.health () + 15) (ExtremeGameMutable.max_health ()))
+      min (ExtremeGameMutable.health () + 10) (ExtremeGameMutable.max_health ()))
   else if mode = "Sudden Death" then (
-    SuddenDeathMutable._time := SuddenDeathMutable.time () + 10;
+    SuddenDeathMutable._time := SuddenDeathMutable.time () + 15;
     SuddenDeathMutable._health :=
-      min (SuddenDeathMutable.health () + 15) (SuddenDeathMutable.max_health ()))
+      min (SuddenDeathMutable.health () + 10) (SuddenDeathMutable.max_health ()))
   else if mode = "Chaos" then (
-    ChaosGameMutable._time := ChaosGameMutable.time () + 10;
+    ChaosGameMutable._time := ChaosGameMutable.time () + 15;
     ChaosGameMutable._health :=
-      min (ChaosGameMutable.health () + 15) (ChaosGameMutable.max_health ()))
+      min (ChaosGameMutable.health () + 10) (ChaosGameMutable.max_health ()))
   else failwith "Item cringe"
 
 let edible_clock : item =
