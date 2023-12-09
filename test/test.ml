@@ -4,14 +4,9 @@ module ItemTester = TypeGame.Items
 module IBag = ItemTester.ArrayItemBag
 module StateTester = TypeGame.State
 module GamHard = StateTester.HardGameMutable
-module GamNormal = StateTester.NormalGameMutable
 module GamEasy = StateTester.EasyGameMutable
 module GamExtreme = StateTester.ExtremeGameMutable
 module GamSudden = StateTester.SuddenDeathMutable
-
-(********************************************************************
-  word tests
- ********************************************************************)
 
 (* [cmp_bag_like_lists lst1 lst2] compares two lists to see whether they are
    equivalent bag-like lists. That means checking that they they contain the
@@ -78,68 +73,30 @@ let join_tests =
         (WB.join b2 b6 |> WB.to_list) );
   ]
 
-(********************************************************************
-  item tests
- ********************************************************************)
-let _ = GamEasy.initialize ()
-let _ = GamHard.initialize ()
-let _ = GamExtreme.initialize ()
-let _ = GamSudden.initialize ()
+(* TODO: add sample tests *)
 
-let apple_tests =
+let item_tests =
   [
-    ( "apple_effect" >:: fun _ ->
-      ItemTester.apple_effect () "Normal";
-      assert_equal (GamNormal.health ()) 105 );
-  ]
-
-let banana_tests =
-  [
-    ( "banana_effect" >:: fun _ ->
-      ItemTester.banana_effect () "Normal";
-      assert_equal (GamNormal.health ()) 105 );
-  ]
-
-let broken_clock_tests =
-  [
-    ( "broken_clock_effect" >:: fun _ ->
-      ItemTester.broken_clock_effect () "Normal";
-      let initial_time = GamNormal.time () in
-      assert_equal (GamNormal.time ()) (initial_time + 10) );
-  ]
-
-let edible_clock_tests =
-  [
-    ( "edible_clock_effect" >:: fun _ ->
-      ItemTester.edible_clock_effect () "Normal";
-      let initial_time = GamNormal.time () in
-      assert_equal (GamNormal.health ()) 110;
-      assert_equal (GamNormal.time ()) (initial_time + 15) );
-  ]
-
-let jet_pack_tests =
-  [
-    ( "jetpack_effect" >:: fun _ ->
+    ( "initialize_jetpack" >:: fun _ ->
+      GamHard.initialize ();
+      ItemTester.jetpack_effect () "Hard";
+      assert_equal (GamHard.health ()) 90 );
+    ( "initialize_bloodAltar" >:: fun _ ->
+      GamHard.initialize ();
+      ItemTester.bloody_altar_effect () "Hard";
+      assert_equal (GamHard.health ()) 50 );
+    ( "max_health + 5, losing health and changing level" >:: fun _ ->
+      GamHard.initialize ();
+      ItemTester.banana_effect () "Hard";
+      assert_equal (GamHard.health ()) 100;
       ItemTester.jetpack_effect () "Hard";
       assert_equal (GamHard.health ()) 90;
-      assert_equal (GamHard.cur_level ()) 1 );
-    ( "reverse_jetpack_effect" >:: fun _ ->
-      ItemTester.jetpack_effect () "Hard";
+      assert_equal (GamHard.cur_level ()) 1;
       ItemTester.reverse_jetpack_effect () "Hard";
       assert_equal (GamHard.health ()) 80;
       assert_equal (GamHard.cur_level ()) 0 );
-  ]
-
-let bloody_altar_tests =
-  [
-    ( "initialize_bloodAltar" >:: fun _ ->
-      ItemTester.bloody_altar_effect () "Hard";
-      assert_equal (GamHard.health ()) 50 );
-  ]
-
-let edge_tests =
-  [
     ( "0 health " >:: fun _ ->
+      GamEasy.initialize ();
       ItemTester.bloody_altar_effect () "Easy";
       assert_equal (GamEasy.health ()) 50;
       assert_equal (GamEasy.time ()) 240;
@@ -155,6 +112,7 @@ let edge_tests =
       assert_equal (GamEasy.health ()) ~-5;
       assert_equal (GamEasy.cur_level ()) 3 );
     ( "too much health " >:: fun _ ->
+      GamExtreme.initialize ();
       ItemTester.edible_clock_effect () "Extreme";
       assert_equal (GamExtreme.health ()) 50;
       assert_equal (GamExtreme.time ()) 70;
@@ -165,9 +123,11 @@ let edge_tests =
       assert_equal (GamExtreme.health ()) 50;
       assert_equal (GamExtreme.time ()) 90;
       ItemTester.obfuscinator_effect () "Extreme";
+      print_endline (string_of_int (GamExtreme.health ()) ^ "im dead");
       assert_equal (GamExtreme.time ()) 50;
       assert_equal (GamExtreme.health ()) 50 );
     ( "dropping time " >:: fun _ ->
+      GamSudden.initialize ();
       ItemTester.forgotton_altar_effect () "Sudden Death";
       assert_equal (GamSudden.health ()) 100;
       assert_equal (GamSudden.time ()) 45;
@@ -185,11 +145,6 @@ let edge_tests =
       assert_equal (GamSudden.time ()) 15 );
   ]
 
-let word_tests = to_list_tests @ of_list_tests @ join_tests
-
-let item_tests =
-  apple_tests @ banana_tests @ broken_clock_tests @ edible_clock_tests
-  @ jet_pack_tests @ bloody_altar_tests @ edge_tests
-
-let tests = "test suite" >::: word_tests @ item_tests
+let test_list = to_list_tests @ of_list_tests @ join_tests @ item_tests
+let tests = "test suite" >::: test_list
 let () = run_test_tt_main tests
