@@ -53,6 +53,12 @@ val black_cat_trinket_effect : unit -> string -> unit
 (** Halves your current level. *)
 val regression_stone_effect : unit -> string -> unit
 
+(** Adds a random amount of health from 1-20. *)
+val wizards_wand_effect : unit -> string -> unit
+
+(** Subtracts 5 time. *)
+val crystal_of_clarity_effect : unit -> string -> unit
+
 (** The signature for the module that randomly selects an item. *)
 module type ItemBag = sig
   (** The data representation for pulling an item. *)

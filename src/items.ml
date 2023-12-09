@@ -535,7 +535,7 @@ let regression_stone : item =
 
 let wizards_wand_effect () mode =
   Random.self_init ();
-  let rand_int = Random.int 20 in
+  let rand_int = (Random.int 20) + 1 in
   match mode with
   | "Easy" ->
       EasyGameMutable._health :=
