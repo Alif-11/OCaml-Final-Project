@@ -22,6 +22,8 @@ type name =
   | WordEviscerInator
   | BlackCatTrinket
   | RegressionStone
+  | WizardsWand
+  | CrystalOfClarity
 
 type rarity =
   | Common
@@ -531,6 +533,71 @@ let regression_stone : item =
     [ "-??? Levels" ],
     regression_stone_effect )
 
+let wizards_wand_effect () mode =
+  Random.self_init ();
+  let rand_int = Random.int 20 in
+  match mode with
+  | "Easy" ->
+      EasyGameMutable._health :=
+        min
+          (EasyGameMutable.health () + rand_int)
+          (EasyGameMutable.max_health ())
+  | "Normal" ->
+      NormalGameMutable._health :=
+        min
+          (NormalGameMutable.health () + rand_int)
+          (NormalGameMutable.max_health ())
+  | "Hard" ->
+      HardGameMutable._health :=
+        min
+          (HardGameMutable.health () + rand_int)
+          (HardGameMutable.max_health ())
+  | "Extreme" ->
+      ExtremeGameMutable._health :=
+        min
+          (ExtremeGameMutable.health () + rand_int)
+          (ExtremeGameMutable.max_health ())
+  | "Sudden Death" ->
+      SuddenDeathMutable._health :=
+        min
+          (SuddenDeathMutable.health () + rand_int)
+          (SuddenDeathMutable.max_health ())
+  | "Chaos" ->
+      ChaosGameMutable._health :=
+        min
+          (ChaosGameMutable.health () + rand_int)
+          (ChaosGameMutable.max_health ())
+  | _ -> failwith "Invalid game mode"
+
+let wizards_wand : item =
+  ( WizardsWand,
+    Epic,
+    "Wizard's Wand",
+    "Shall I cast a spell?...",
+    [ "+??? HP" ],
+    wizards_wand_effect )
+
+let crystal_of_clarity_effect () mode =
+  match mode with
+  | "Easy" -> EasyGameMutable._time := max (EasyGameMutable.time () - 5) 1
+  | "Normal" ->
+      NormalGameMutable._health := max (NormalGameMutable.time () - 5) 1
+  | "Hard" -> HardGameMutable._health := max (HardGameMutable.time () - 5) 1
+  | "Extreme" ->
+      ExtremeGameMutable._health := max (ExtremeGameMutable.time () - 5) 1
+  | "Sudden Death" ->
+      SuddenDeathMutable._health := max (SuddenDeathMutable.time () - 5) 1
+  | "Chaos" -> ChaosGameMutable._health := max (ChaosGameMutable.time () - 5) 1
+  | _ -> failwith "Invalid game mode"
+
+let crystal_of_clarity : item =
+  ( CrystalOfClarity,
+    Rare,
+    "Crystal of Clarity",
+    "See the future?",
+    [ "??? Time" ],
+    wizards_wand_effect )
+
 module type ItemBag = sig
   type items
 
@@ -550,7 +617,12 @@ module ArrayItemBag : ItemBag = struct
       common = [| apple; banana |];
       rare =
         [|
-          broken_clock; forgotton_altar; bloody_altar; jetpack; big_frying_pan;
+          broken_clock;
+          forgotton_altar;
+          bloody_altar;
+          jetpack;
+          big_frying_pan;
+          crystal_of_clarity;
         |];
       epic =
         [|
@@ -559,6 +631,7 @@ module ArrayItemBag : ItemBag = struct
           reverse_jetpack;
           word_eviscer_inator;
           regression_stone;
+          wizards_wand;
         |];
       undiscovered = [| chaos; black_cat_trinket |];
     }
@@ -633,6 +706,13 @@ let effect_to_string (item : item) =
       ]
   | BlackCatTrinket -> [ "You were warned..." ]
   | RegressionStone -> [ "Shwoop da woop! You were sent back in time." ]
+  | WizardsWand -> [ "You cast a spell!... on yourself? You feel healthier." ]
+  | CrystalOfClarity ->
+      [
+        "You look into the future...";
+        "You lost 5 time.";
+        "That was a waste of time.";
+      ]
 
 let flavor_to_string (item : item) =
   let _, _, _, f, _, _ = item in
