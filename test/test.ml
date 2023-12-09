@@ -4,6 +4,7 @@ module ItemTester = TypeGame.Items
 module IBag = ItemTester.ArrayItemBag
 module StateTester = TypeGame.State
 module GamHard = StateTester.HardGameMutable
+module GamNormal = StateTester.NormalGameMutable
 module GamEasy = StateTester.EasyGameMutable
 module GamExtreme = StateTester.ExtremeGameMutable
 module GamSudden = StateTester.SuddenDeathMutable
@@ -85,6 +86,37 @@ let _ = GamHard.initialize ()
 let _ = GamExtreme.initialize ()
 let _ = GamSudden.initialize ()
 
+let apple_tests =
+  [
+    ( "apple_effect" >:: fun _ ->
+      ItemTester.apple_effect () "Normal";
+      assert_equal (GamNormal.health ()) 105 );
+  ]
+
+let banana_tests =
+  [
+    ( "banana_effect" >:: fun _ ->
+      ItemTester.banana_effect () "Normal";
+      assert_equal (GamNormal.health ()) 105 );
+  ]
+
+let broken_clock_tests =
+  [
+    ( "broken_clock_effect" >:: fun _ ->
+      ItemTester.broken_clock_effect () "Normal";
+      let initial_time = GamNormal.time () in
+      assert_equal (GamNormal.time ()) (initial_time + 10) );
+  ]
+
+let edible_clock_tests =
+  [
+    ( "edible_clock_effect" >:: fun _ ->
+      ItemTester.edible_clock_effect () "Normal";
+      let initial_time = GamNormal.time () in
+      assert_equal (GamNormal.health ()) 110;
+      assert_equal (GamNormal.time ()) (initial_time + 15) );
+  ]
+
 let jet_pack_tests =
   [
     ( "jetpack_effect" >:: fun _ ->
@@ -154,6 +186,10 @@ let edge_tests =
   ]
 
 let word_tests = to_list_tests @ of_list_tests @ join_tests
-let item_tests = jet_pack_tests @ bloody_altar_tests @ edge_tests
+
+let item_tests =
+  apple_tests @ banana_tests @ broken_clock_tests @ edible_clock_tests
+  @ jet_pack_tests @ bloody_altar_tests @ edge_tests
+
 let tests = "test suite" >::: word_tests @ item_tests
 let () = run_test_tt_main tests
