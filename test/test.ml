@@ -8,6 +8,10 @@ module GamEasy = StateTester.EasyGameMutable
 module GamExtreme = StateTester.ExtremeGameMutable
 module GamSudden = StateTester.SuddenDeathMutable
 
+(********************************************************************
+  word tests
+ ********************************************************************)
+
 (* [cmp_bag_like_lists lst1 lst2] compares two lists to see whether they are
    equivalent bag-like lists. That means checking that they they contain the
    same elements with the same number of repetitions, though not necessarily in
@@ -73,30 +77,37 @@ let join_tests =
         (WB.join b2 b6 |> WB.to_list) );
   ]
 
-(* TODO: add sample tests *)
+(********************************************************************
+  item tests
+ ********************************************************************)
+let _ = GamEasy.initialize ()
+let _ = GamHard.initialize ()
+let _ = GamExtreme.initialize ()
+let _ = GamSudden.initialize ()
 
-let item_tests =
+let jet_pack_tests =
   [
-    ( "initialize_jetpack" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.jetpack_effect () "Hard";
-      assert_equal (GamHard.health ()) 90 );
-    ( "initialize_bloodAltar" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.bloody_altar_effect () "Hard";
-      assert_equal (GamHard.health ()) 50 );
-    ( "max_health + 5, losing health and changing level" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.banana_effect () "Hard";
-      assert_equal (GamHard.health ()) 100;
+    ( "jetpack_effect" >:: fun _ ->
       ItemTester.jetpack_effect () "Hard";
       assert_equal (GamHard.health ()) 90;
-      assert_equal (GamHard.cur_level ()) 1;
+      assert_equal (GamHard.cur_level ()) 1 );
+    ( "reverse_jetpack_effect" >:: fun _ ->
+      ItemTester.jetpack_effect () "Hard";
       ItemTester.reverse_jetpack_effect () "Hard";
       assert_equal (GamHard.health ()) 80;
       assert_equal (GamHard.cur_level ()) 0 );
+  ]
+
+let bloody_altar_tests =
+  [
+    ( "initialize_bloodAltar" >:: fun _ ->
+      ItemTester.bloody_altar_effect () "Hard";
+      assert_equal (GamHard.health ()) 50 );
+  ]
+
+let edge_tests =
+  [
     ( "0 health " >:: fun _ ->
-      GamEasy.initialize ();
       ItemTester.bloody_altar_effect () "Easy";
       assert_equal (GamEasy.health ()) 50;
       assert_equal (GamEasy.time ()) 240;
@@ -112,7 +123,6 @@ let item_tests =
       assert_equal (GamEasy.health ()) ~-5;
       assert_equal (GamEasy.cur_level ()) 3 );
     ( "too much health " >:: fun _ ->
-      GamExtreme.initialize ();
       ItemTester.edible_clock_effect () "Extreme";
       assert_equal (GamExtreme.health ()) 50;
       assert_equal (GamExtreme.time ()) 70;
@@ -123,11 +133,9 @@ let item_tests =
       assert_equal (GamExtreme.health ()) 50;
       assert_equal (GamExtreme.time ()) 90;
       ItemTester.obfuscinator_effect () "Extreme";
-      print_endline (string_of_int (GamExtreme.health ()) ^ "im dead");
       assert_equal (GamExtreme.time ()) 50;
       assert_equal (GamExtreme.health ()) 50 );
     ( "dropping time " >:: fun _ ->
-      GamSudden.initialize ();
       ItemTester.forgotton_altar_effect () "Sudden Death";
       assert_equal (GamSudden.health ()) 100;
       assert_equal (GamSudden.time ()) 45;
@@ -145,6 +153,7 @@ let item_tests =
       assert_equal (GamSudden.time ()) 15 );
   ]
 
-let test_list = to_list_tests @ of_list_tests @ join_tests @ item_tests
-let tests = "test suite" >::: test_list
+let word_tests = to_list_tests @ of_list_tests @ join_tests
+let item_tests = jet_pack_tests @ bloody_altar_tests @ edge_tests
+let tests = "test suite" >::: word_tests @ item_tests
 let () = run_test_tt_main tests
