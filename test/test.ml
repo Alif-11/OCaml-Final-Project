@@ -8,6 +8,10 @@ module GamEasy = StateTester.EasyGameMutable
 module GamExtreme = StateTester.ExtremeGameMutable
 module GamSudden = StateTester.SuddenDeathMutable
 
+(********************************************************************
+  word tests
+ ********************************************************************)
+
 (* [cmp_bag_like_lists lst1 lst2] compares two lists to see whether they are
    equivalent bag-like lists. That means checking that they they contain the
    same elements with the same number of repetitions, though not necessarily in
@@ -73,9 +77,11 @@ let join_tests =
         (WB.join b2 b6 |> WB.to_list) );
   ]
 
-(* TODO: add sample tests *)
+(********************************************************************
+  item tests
+ ********************************************************************)
 
-let item_tests =
+let edge_tests =
   [
     ( "initialize_jetpack" >:: fun _ ->
       GamHard.initialize ();
@@ -145,6 +151,7 @@ let item_tests =
       assert_equal (GamSudden.time ()) 15 );
   ]
 
-let test_list = to_list_tests @ of_list_tests @ join_tests @ item_tests
-let tests = "test suite" >::: test_list
+let word_tests = to_list_tests @ of_list_tests @ join_tests
+let item_tests = edge_tests
+let tests = "test suite" >::: word_tests @ item_tests
 let () = run_test_tt_main tests
