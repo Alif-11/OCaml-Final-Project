@@ -20,7 +20,7 @@ title: "The Best OCaml Typing Game"
 # OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
 git-repo: "https://github.coecis.cornell.edu/ax38/cs3110-final"
 # If you have no demo screencast, replace the url string with an empty string ""
-demo-video-url: "https://youtu.be/csCfJ2eJuD4"
+demo-video-url: "https://youtu.be/PKyMOi-mJuA"
 desc: >
   Our project is an interactive typing game. We created bags of words that creates randomly generated
   text sequences for users to type. We have a timer showing the user how long they were typing and a UI 
