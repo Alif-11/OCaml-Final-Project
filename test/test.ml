@@ -32,7 +32,11 @@
    aspects of our system which are the word bags, the items, associated with
    specific game modes and a functioning user interface. Testing those things
    ensures that when a user runs the game, no bugs like health being below 0, or
-   level being negative occur. *)
+   level being negative occur. We use a functor to make our test cases so that
+   we make sure items work for every game mode other than the chaos one, which
+   is randomized and cannot be tested easily. We ensured testing coverage
+   through bisect, ensuring that all items that weren't UI related or randomized
+   were tested.*)
 
 open OUnit2
 module WB = TypeGame.Words.WordBag
@@ -119,393 +123,425 @@ let join_tests =
 (********************************************************************
   item tests
  ********************************************************************)
-let apple_tests =
-  [
-    ( "apple_effect" >:: fun _ ->
-      GamHard.initialize ();
-      GamHard._health := 90;
-      ItemTester.apple_effect () "Hard";
-      assert_equal (GamHard.health ()) 95 );
-    ( "apple_effect max health" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.apple_effect () "Hard";
-      assert_equal (GamHard.health ()) 100 );
-  ]
+module type GMString = sig
+  val gm_name : string
+end
 
-let banana_tests =
-  [
-    ( "banana_effect" >:: fun _ ->
-      GamHard.initialize ();
-      GamHard._health := 90;
-      ItemTester.banana_effect () "Hard";
-      assert_equal (GamHard.health ()) 95 );
-    ( "banana_effect max health" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.banana_effect () "Hard";
-      assert_equal (GamHard.health ()) 100 );
-  ]
+module ItemTest =
+functor
+  (GM : TypeGame.State.GameStateMutable)
+  (N : GMString)
+  ->
+  struct
+    let apple_tests =
+      [
+        ( "apple_effect" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          GM._health := start_health - 10;
+          ItemTester.apple_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health - 5) );
+        ( "apple_effect max health" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          GM._health := start_health - 1;
+          ItemTester.apple_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health );
+      ]
 
-let broken_clock_tests =
-  [
-    ( "broken_clock_effect" >:: fun _ ->
-      GamHard.initialize ();
-      GamHard._time := 50;
-      ItemTester.broken_clock_effect () "Hard";
-      assert_equal (GamHard.time ()) 60 );
-  ]
+    let banana_tests =
+      [
+        ( "banana_effect" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          GM._health := start_health - 10;
+          ItemTester.banana_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health - 5) );
+        ( "banana_effect max health" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          GM._health := start_health - 1;
+          ItemTester.banana_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health );
+      ]
 
-let edible_clock_tests =
-  [
-    ( "edible_clock_effect" >:: fun _ ->
-      GamHard.initialize ();
-      GamHard._health := 50;
-      let initial_time = GamHard.time () in
-      ItemTester.edible_clock_effect () "Hard";
-      assert_equal (GamHard.health ()) 60;
-      assert_equal (GamHard.time ()) (initial_time + 15) );
-  ]
+    let broken_clock_tests =
+      [
+        ( "broken_clock_effect" >:: fun _ ->
+          GM.initialize ();
+          GM._time := 50;
+          ItemTester.broken_clock_effect () N.gm_name;
+          assert_equal (GM.time ()) 60 );
+      ]
 
-let forgotten_altar_tests =
-  [
-    ( "initialize_forgotten_Easy" >:: fun _ ->
-      GamEasy.initialize ();
-      ItemTester.forgotton_altar_effect () "Easy";
-      assert_equal (GamEasy.health ()) 100;
-      assert_equal (GamEasy.time ()) 60 );
-    ( "initialize_forgotten_Normal" >:: fun _ ->
-      GamNormal.initialize ();
-      ItemTester.forgotton_altar_effect () "Normal";
-      assert_equal (GamNormal.health ()) 100;
-      assert_equal (GamNormal.time ()) 60 );
-    ( "initialize_forgotten_Hard" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.forgotton_altar_effect () "Hard";
-      assert_equal (GamHard.health ()) 100;
-      assert_equal (GamHard.time ()) 45 );
-    ( "initialize_forgotten_Extreme" >:: fun _ ->
-      GamExtreme.initialize ();
-      ItemTester.forgotton_altar_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 50;
-      assert_equal (GamExtreme.time ()) 30 );
-    ( "initialize_forgotten_Sudden" >:: fun _ ->
-      GamSudden.initialize ();
-      ItemTester.forgotton_altar_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 100;
-      assert_equal (GamSudden.time ()) 45 );
-  ]
+    let edible_clock_tests =
+      [
+        ( "edible_clock_effect" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          GM._health := start_health - 20;
+          let initial_time = GM.time () in
+          ItemTester.edible_clock_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health - 10);
+          assert_equal (GM.time ()) (initial_time + 15) );
+        ( "edible_clock_overflow" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          let start_time = GM.time () in
+          ItemTester.edible_clock_effect () N.gm_name;
+          assert_equal start_health (GM.health ());
+          assert_equal (start_time + 15) (GM.time ()) );
+      ]
 
-let bloody_altar_tests =
-  [
-    ( "initialize_bloodAltar" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.bloody_altar_effect () "Hard";
-      assert_equal (GamHard.health ()) 50 );
-    ( "bloody_altar_effect" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.bloody_altar_effect () "Hard";
-      assert_equal (GamHard.health ()) 50;
-      assert_equal (GamHard.time ()) 180 );
-    ( "bloody_altar_effect 1 hp" >:: fun _ ->
-      GamHard._health := 1;
-      ItemTester.bloody_altar_effect () "Hard";
-      assert_equal (GamHard.health ()) 1;
-      assert_equal (GamHard.time ()) 360 );
-  ]
+    let forgotten_altar_tests =
+      [
+        ( "initialize_forgotten" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          let start_time = GM.time () in
+          GM._health := start_health / 4;
+          ItemTester.forgotton_altar_effect () N.gm_name;
+          assert_equal (start_health / 4 * 2) (GM.health ());
+          assert_equal (GM.time ()) (start_time / 2) );
+        ( "initialize_forgotten_overflow" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          GM._health := start_health * 3 / 4;
+          GM._time := 1;
+          ItemTester.forgotton_altar_effect () N.gm_name;
+          assert_equal start_health (GM.health ());
+          assert_equal 0 (GM.time ()) );
+      ]
 
-let obfuscinator_tests =
-  [
-    ( "initialize_obfuscinator_Easy" >:: fun _ ->
-      GamEasy.initialize ();
-      ItemTester.obfuscinator_effect () "Easy";
-      assert_equal (GamEasy.health ()) 100;
-      assert_equal (GamEasy.time ()) 100 );
-    ( "initialize_obfuscinator_Normal" >:: fun _ ->
-      GamNormal.initialize ();
-      ItemTester.obfuscinator_effect () "Normal";
-      assert_equal (GamNormal.health ()) 100;
-      assert_equal (GamNormal.time ()) 100 );
-    ( "initialize_obfuscinator_Hard" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.obfuscinator_effect () "Hard";
-      assert_equal (GamHard.health ()) 90;
-      assert_equal (GamHard.time ()) 100 );
-    ( "initialize_obfuscinator_Extreme" >:: fun _ ->
-      GamExtreme.initialize ();
-      ItemTester.obfuscinator_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 50;
-      assert_equal (GamExtreme.time ()) 50 );
-    ( "initialize_obfuscinator_Sudden" >:: fun _ ->
-      GamSudden.initialize ();
-      ItemTester.obfuscinator_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 90;
-      assert_equal (GamSudden.time ()) 100 );
-    ( "initialize_obfuscinator_lowHealth" >:: fun _ ->
-      GamEasy.initialize ();
-      ItemTester.bloody_altar_effect () "Easy";
-      assert_equal (GamEasy.health ()) 50;
-      ItemTester.bloody_altar_effect () "Easy";
-      assert_equal (GamEasy.health ()) 25;
-      ItemTester.bloody_altar_effect () "Easy";
-      assert_equal (GamEasy.health ()) 12;
-      ItemTester.bloody_altar_effect () "Easy";
-      assert_equal (GamEasy.health ()) 6;
-      ItemTester.bloody_altar_effect () "Easy";
-      assert_equal (GamEasy.health ()) 3;
-      ItemTester.bloody_altar_effect () "Easy";
-      assert_equal (GamEasy.health ()) 1;
-      ItemTester.obfuscinator_effect () "Easy";
-      assert_equal (GamEasy.health ()) 100;
-      assert_equal (GamEasy.time ()) 1;
-      ItemTester.obfuscinator_effect () "Easy";
-      assert_equal (GamEasy.health ()) 1;
-      assert_equal (GamEasy.time ()) 100;
-      ItemTester.jetpack_effect () "Easy";
-      assert_equal (GamEasy.health ()) 0;
-      ItemTester.obfuscinator_effect () "Easy";
-      assert_equal (GamEasy.health ()) 100;
-      assert_equal (GamEasy.time ()) 0 );
-  ]
+    let bloody_altar_tests =
+      [
+        ( "initialize_bloodAltar" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          let start_time = GM.time () in
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health / 2);
+          assert_equal (GM.time ()) (start_time * 2) );
+        ( "bloody_altar_effect 1 hp" >:: fun _ ->
+          GM.initialize ();
+          let start_time = GM.time () in
+          GM._health := 1;
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal ~printer:string_of_int (GM.health ()) 1;
+          assert_equal ~printer:string_of_int (GM.time ()) (start_time * 2) );
+      ]
 
-let jet_pack_tests =
-  [
-    ( "initialize_jetpack" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.jetpack_effect () "Hard";
-      assert_equal (GamHard.health ()) 90 );
-    ( "jetpack_effect" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.jetpack_effect () "Hard";
-      assert_equal (GamHard.health ()) 90;
-      assert_equal (GamHard.cur_level ()) 1 );
-    ( "reverse_jetpack_effect" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.jetpack_effect () "Hard";
-      ItemTester.reverse_jetpack_effect () "Hard";
-      assert_equal (GamHard.health ()) 80;
-      assert_equal (GamHard.cur_level ()) 0 );
-  ]
+    let obfuscinator_tests =
+      [
+        ( "initialize_obfuscinator_Easy" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          let start_time = GM.time () in
+          ItemTester.obfuscinator_effect () N.gm_name;
+          assert_equal (GM.health ()) (min (GM.max_health ()) start_time);
+          assert_equal (GM.time ()) start_health );
+        ( "initialize_obfuscinator_lowHealth" >:: fun _ ->
+          GM.initialize ();
+          GM._health := 50;
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) 25;
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) 12;
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) 6;
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) 3;
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) 1;
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) 1;
+          ItemTester.obfuscinator_effect () N.gm_name;
+          assert_equal (GM.health ()) (GM.max_health ());
+          assert_equal (GM.time ()) 1;
+          ItemTester.obfuscinator_effect () N.gm_name;
+          assert_equal (GM.health ()) 1;
+          assert_equal (GM.time ()) (GM.max_health ());
+          ItemTester.jetpack_effect () N.gm_name;
+          assert_equal (GM.health ()) 0;
+          let mid_time = GM.time () in
+          ItemTester.obfuscinator_effect () N.gm_name;
+          assert_equal ~printer:string_of_int (GM.health ()) mid_time;
+          assert_equal (GM.time ()) 0 );
+      ]
 
-let fryingpan_tests =
-  [
-    ( "initialize_fryingpan_Easy" >:: fun _ ->
-      GamEasy.initialize ();
-      ItemTester.big_frying_pan_effect () "Easy";
-      assert_equal (GamEasy.health ()) 95;
-      assert_equal (GamEasy.max_health ()) 95 );
-    ( "initialize_fryingpan_Normal" >:: fun _ ->
-      GamNormal.initialize ();
-      ItemTester.big_frying_pan_effect () "Normal";
-      assert_equal (GamNormal.health ()) 95;
-      assert_equal (GamNormal.max_health ()) 95 );
-    ( "initialize_fryingpan_Hard" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.big_frying_pan_effect () "Hard";
-      assert_equal (GamHard.health ()) 95;
-      assert_equal (GamHard.max_health ()) 95 );
-    ( "initialize_fryingpan_Extreme" >:: fun _ ->
-      GamExtreme.initialize ();
-      ItemTester.big_frying_pan_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 45;
-      assert_equal (GamExtreme.max_health ()) 45 );
-    ( "initialize_fryingpan_Sudden" >:: fun _ ->
-      GamSudden.initialize ();
-      ItemTester.big_frying_pan_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 95;
-      assert_equal (GamSudden.max_health ()) 95 );
-  ]
+    let jet_pack_tests =
+      [
+        ( "initialize_jetpack" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          ItemTester.jetpack_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health - 10) );
+        ( "jetpack_effect" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          ItemTester.jetpack_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health - 10);
+          assert_equal (GM.cur_level ()) 1 );
+        ( "reverse_jetpack_effect" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          ItemTester.jetpack_effect () N.gm_name;
+          ItemTester.reverse_jetpack_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health - 20);
+          assert_equal (GM.cur_level ()) 0 );
+      ]
 
-let word_eviscer_inator_tests =
-  [
-    ( "initialize_eviscer_Easy" >:: fun _ ->
-      GamEasy.initialize ();
-      ItemTester.word_eviscer_inator_effect () "Easy";
-      assert_equal (GamEasy.num_words ()) 46 );
-    ( "initialize_eviscer_Normal" >:: fun _ ->
-      GamNormal.initialize ();
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 46 );
-    ( "initialize_eviscer_Hard" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.word_eviscer_inator_effect () "Hard";
-      assert_equal (GamHard.num_words ()) 56 );
-    ( "initialize_eviscer_Extreme" >:: fun _ ->
-      GamExtreme.initialize ();
-      ItemTester.word_eviscer_inator_effect () "Extreme";
-      assert_equal (GamExtreme.num_words ()) 56 );
-    ( "initialize_eviscer_Sudden" >:: fun _ ->
-      GamSudden.initialize ();
-      ItemTester.word_eviscer_inator_effect () "Sudden Death";
-      assert_equal (GamSudden.num_words ()) 56 );
-  ]
+    let fryingpan_tests =
+      [
+        ( "initialize_fryingpan_Easy" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          let start_max_health = GM.max_health () in
+          ItemTester.big_frying_pan_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health - 5);
+          assert_equal (GM.max_health ()) (start_max_health - 5) );
+      ]
 
-let black_cat_tests =
-  [
-    ( "initialize_black_cat_Easy" >:: fun _ ->
-      GamEasy.initialize ();
-      ItemTester.black_cat_trinket_effect () "Easy";
-      assert_equal (GamEasy.health ()) 1;
-      assert_equal (GamEasy.max_health ()) 1 );
-    ( "initialize_black_cat_Normal" >:: fun _ ->
-      GamNormal.initialize ();
-      ItemTester.black_cat_trinket_effect () "Normal";
-      assert_equal (GamNormal.health ()) 1;
-      assert_equal (GamNormal.max_health ()) 1 );
-    ( "initialize_black_cat_Hard" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.black_cat_trinket_effect () "Hard";
-      assert_equal (GamHard.health ()) 1;
-      assert_equal (GamHard.max_health ()) 1 );
-    ( "initialize_black_cat_Extreme" >:: fun _ ->
-      GamExtreme.initialize ();
-      ItemTester.black_cat_trinket_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 1;
-      assert_equal (GamExtreme.max_health ()) 1 );
-    ( "initialize_black_cat_Sudden" >:: fun _ ->
-      GamSudden.initialize ();
-      ItemTester.black_cat_trinket_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 1;
-      assert_equal (GamSudden.max_health ()) 1 );
-  ]
+    let word_eviscer_inator_tests =
+      [
+        ( "initialize_eviscer" >:: fun _ ->
+          GM.initialize ();
+          let start_words = GM.num_words () in
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) (start_words - 4) );
+        ( "eviscer_overflow" >:: fun _ ->
+          GM.initialize ();
+          GM._num_words := 12;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal 10 (GM.num_words ()) );
+      ]
 
-let regression_tests =
-  [
-    ( "initialize_regression_Easy" >:: fun _ ->
-      GamEasy.initialize ();
-      ItemTester.regression_stone_effect () "Easy";
-      assert_equal (GamEasy.cur_level ()) 0 );
-    ( "initialize_regression_Normal" >:: fun _ ->
-      GamNormal.initialize ();
-      ItemTester.regression_stone_effect () "Normal";
-      assert_equal (GamNormal.cur_level ()) 0 );
-    ( "initialize_regression_Hard" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.regression_stone_effect () "Hard";
-      assert_equal (GamHard.cur_level ()) 0 );
-    ( "initialize_regression_Extreme" >:: fun _ ->
-      GamExtreme.initialize ();
-      ItemTester.regression_stone_effect () "Extreme";
-      assert_equal (GamExtreme.cur_level ()) 0 );
-    ( "initialize_regression_Sudden" >:: fun _ ->
-      GamSudden.initialize ();
-      ItemTester.regression_stone_effect () "Sudden Death";
-      assert_equal (GamSudden.cur_level ()) 0 );
-  ]
+    let black_cat_tests =
+      [
+        ( "initialize_black_cat " >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          GM._health := start_health - 30;
+          ItemTester.black_cat_trinket_effect () N.gm_name;
+          assert_equal (GM.health ()) 30;
+          assert_equal (GM.max_health ()) 30 );
+        ( "black_cat_overflow" >:: fun _ ->
+          GM.initialize ();
+          ItemTester.black_cat_trinket_effect () N.gm_name;
+          assert_equal (GM.health ()) 1;
+          assert_equal (GM.max_health ()) 1 );
+      ]
 
-let edge_tests =
-  [
-    ( "max_health + 5, losing health and changing level" >:: fun _ ->
-      GamHard.initialize ();
-      ItemTester.banana_effect () "Hard";
-      assert_equal (GamHard.health ()) 100;
-      ItemTester.jetpack_effect () "Hard";
-      assert_equal (GamHard.health ()) 90;
-      assert_equal (GamHard.cur_level ()) 1;
-      ItemTester.reverse_jetpack_effect () "Hard";
-      assert_equal (GamHard.health ()) 80;
-      assert_equal (GamHard.cur_level ()) 0 );
-    ( "0 health , changing level" >:: fun _ ->
-      GamEasy.initialize ();
-      ItemTester.bloody_altar_effect () "Easy";
-      assert_equal (GamEasy.health ()) 50;
-      assert_equal (GamEasy.time ()) 240;
-      ItemTester.bloody_altar_effect () "Easy";
-      assert_equal (GamEasy.health ()) 25;
-      ItemTester.jetpack_effect () "Easy";
-      assert_equal (GamEasy.health ()) 15;
-      assert_equal (GamEasy.cur_level ()) 1;
-      ItemTester.jetpack_effect () "Easy";
-      assert_equal (GamEasy.health ()) 5;
-      assert_equal (GamEasy.cur_level ()) 2;
-      ItemTester.jetpack_effect () "Easy";
-      assert_equal (GamEasy.health ()) 0;
-      assert_equal (GamEasy.cur_level ()) 3 );
-    ( "too much health, swapping health and time " >:: fun _ ->
-      GamExtreme.initialize ();
-      ItemTester.edible_clock_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 50;
-      assert_equal (GamExtreme.time ()) 75;
-      ItemTester.edible_clock_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 50;
-      assert_equal (GamExtreme.time ()) 90;
-      ItemTester.edible_clock_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 50;
-      assert_equal (GamExtreme.time ()) 105;
-      ItemTester.obfuscinator_effect () "Extreme";
-      assert_equal (GamExtreme.health ()) 50;
-      assert_equal (GamExtreme.time ()) 50 );
-    ( "dropping time " >:: fun _ ->
-      GamSudden.initialize ();
-      ItemTester.forgotton_altar_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 100;
-      assert_equal (GamSudden.time ()) 45;
-      ItemTester.forgotton_altar_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 100;
-      assert_equal (GamSudden.time ()) 22;
-      ItemTester.forgotton_altar_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 100;
-      assert_equal (GamSudden.time ()) 11;
-      ItemTester.forgotton_altar_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 100;
-      assert_equal (GamSudden.time ()) 5;
-      ItemTester.broken_clock_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 100;
-      assert_equal (GamSudden.time ()) 15 );
-    ( "dropping number of words " >:: fun _ ->
-      GamNormal.initialize ();
-      assert_equal (GamNormal.num_words ()) 50;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 46;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 42;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 38;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 34;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 30;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 26;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 22;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 18;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 14;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 10;
-      ItemTester.word_eviscer_inator_effect () "Normal";
-      assert_equal (GamNormal.num_words ()) 10 );
-    ( "attempting level below 0" >:: fun _ ->
-      GamSudden.initialize ();
-      assert_equal (GamSudden.cur_level ()) 0;
-      ItemTester.reverse_jetpack_effect () "Sudden Death";
-      assert_equal (GamSudden.cur_level ()) 0;
-      assert_equal (GamSudden.health ()) 90;
-      ItemTester.regression_stone_effect () "Sudden Death";
-      assert_equal (GamSudden.cur_level ()) 0;
-      ItemTester.jetpack_effect () "Sudden Death";
-      assert_equal (GamSudden.cur_level ()) 1;
-      assert_equal (GamSudden.health ()) 80;
-      ItemTester.regression_stone_effect () "Sudden Death";
-      assert_equal (GamSudden.cur_level ()) 0;
-      ItemTester.edible_clock_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 90;
-      assert_equal (GamSudden.time ()) 105;
-      ItemTester.apple_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 95;
-      ItemTester.banana_effect () "Sudden Death";
-      assert_equal (GamSudden.health ()) 100 );
-  ]
+    let regression_tests =
+      [
+        ( "initialize_regression" >:: fun _ ->
+          GM.initialize ();
+          ItemTester.regression_stone_effect () N.gm_name;
+          assert_equal (GM.cur_level ()) 0 );
+        ( "regression_usual" >:: fun _ ->
+          GM.initialize ();
+          GM._cur_level := 4;
+          ItemTester.regression_stone_effect () N.gm_name;
+          assert_equal ~printer:string_of_int (GM.cur_level ()) 2 );
+      ]
+
+    let clarity_tests =
+      [
+        ( "initialize_clarity" >:: fun _ ->
+          GM.initialize ();
+          let start_time = GM.time () in
+          ItemTester.crystal_of_clarity_effect () N.gm_name;
+          assert_equal ~printer:string_of_int (GM.time ()) (start_time - 5) );
+        ( "clarity overflow test" >:: fun _ ->
+          GM.initialize ();
+          GM._time := 3;
+          ItemTester.crystal_of_clarity_effect () N.gm_name;
+          assert_equal (GM.time ()) 1 );
+      ]
+
+    let edge_tests =
+      [
+        ( "max_health + 5, losing health and changing level" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          ItemTester.banana_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health;
+          ItemTester.jetpack_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health - 10);
+          assert_equal (GM.cur_level ()) 1;
+          ItemTester.reverse_jetpack_effect () N.gm_name;
+          assert_equal (GM.health ()) (start_health - 20);
+          assert_equal (GM.cur_level ()) 0 );
+        ( "0 health , changing level" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          let start_time = GM.time () in
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) (max (start_health / 2) 1);
+          assert_equal (GM.time ()) (start_time * 2);
+          ItemTester.bloody_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) (max (start_health / 4) 1);
+          ItemTester.jetpack_effect () N.gm_name;
+          assert_equal (GM.health ()) (max ((start_health / 4) - 10) 0);
+          assert_equal (GM.cur_level ()) 1;
+          ItemTester.jetpack_effect () N.gm_name;
+          assert_equal (GM.health ()) (max ((start_health / 4) - 20) 0);
+          assert_equal (GM.cur_level ()) 2;
+          ItemTester.jetpack_effect () N.gm_name;
+          assert_equal (GM.health ()) 0;
+          assert_equal (GM.cur_level ()) 3 );
+        ( "too much health, swapping health and time " >:: fun _ ->
+          GM.initialize ();
+          let start_time = GM.time () in
+          let start_health = GM.health () in
+          ItemTester.edible_clock_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health;
+          assert_equal (GM.time ()) (start_time + 15);
+          ItemTester.edible_clock_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health;
+          assert_equal (GM.time ()) (start_time + 30);
+          ItemTester.edible_clock_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health;
+          assert_equal (GM.time ()) (start_time + 45);
+          ItemTester.obfuscinator_effect () N.gm_name;
+          assert_equal (GM.health ()) (GM.max_health ());
+          assert_equal (GM.time ()) start_health );
+        ( "dropping time " >:: fun _ ->
+          GM.initialize ();
+          let start_time = GM.time () in
+          let start_health = GM.health () in
+          ItemTester.forgotton_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health;
+          assert_equal (GM.time ()) (max (start_time / 2) 0);
+          ItemTester.forgotton_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health;
+          assert_equal (GM.time ()) (max (start_time / 4) 0);
+          ItemTester.forgotton_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health;
+          assert_equal (GM.time ()) (max (start_time / 8) 0);
+          ItemTester.forgotton_altar_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health;
+          assert_equal (GM.time ()) (max (start_time / 16) 0);
+          ItemTester.broken_clock_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health;
+          assert_equal (GM.time ()) (max (start_time / 16) 0 + 10) );
+        ( "dropping number of words " >:: fun _ ->
+          GM.initialize ();
+          GM._num_words := 50;
+          assert_equal (GM.num_words ()) 50;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 46;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 42;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 38;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 34;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 30;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 26;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 22;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 18;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 14;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 10;
+          ItemTester.word_eviscer_inator_effect () N.gm_name;
+          assert_equal (GM.num_words ()) 10 );
+        ( "attempting level below 0" >:: fun _ ->
+          GM.initialize ();
+          let start_health = GM.health () in
+          let start_time = GM.time () in
+          assert_equal (GM.cur_level ()) 0;
+          ItemTester.reverse_jetpack_effect () N.gm_name;
+          assert_equal (GM.cur_level ()) 0;
+          assert_equal (GM.health ()) (max (start_health - 10) 0);
+          ItemTester.regression_stone_effect () N.gm_name;
+          assert_equal ~printer:string_of_int (GM.cur_level ()) 0;
+          ItemTester.jetpack_effect () N.gm_name;
+          assert_equal (GM.cur_level ()) 1;
+          assert_equal (GM.health ()) (max (start_health - 20) 0);
+          assert_equal (GM.time ()) start_time;
+          ItemTester.regression_stone_effect () N.gm_name;
+          assert_equal (GM.cur_level ()) 0;
+          let mid_time = GM.time () in
+          ItemTester.edible_clock_effect () N.gm_name;
+          assert_equal (GM.health ()) (max (start_health - 10) 0);
+          assert_equal (GM.time ()) (mid_time + 15);
+          ItemTester.apple_effect () N.gm_name;
+          assert_equal (GM.health ()) (max (start_health - 5) 0);
+          ItemTester.banana_effect () N.gm_name;
+          assert_equal (GM.health ()) start_health );
+      ]
+  end
+
+module EasyString : GMString = struct
+  let gm_name = "Easy"
+end
+
+module NormalString : GMString = struct
+  let gm_name = "Normal"
+end
+
+module HardString : GMString = struct
+  let gm_name = "Hard"
+end
+
+module ExtremeString : GMString = struct
+  let gm_name = "Extreme"
+end
+
+module SuddenDeathString : GMString = struct
+  let gm_name = "Sudden Death"
+end
+
+module EasyTest = ItemTest (GamEasy) (EasyString)
+module NormalTest = ItemTest (GamNormal) (NormalString)
+module HardTest = ItemTest (GamHard) (HardString)
+module ExtremeTest = ItemTest (GamExtreme) (ExtremeString)
+module SuddenDeathTest = ItemTest (GamSudden) (SuddenDeathString)
 
 (* manually tested chaos effect, what items get chosen, chaos items (item has a
    random effect) *)
 let word_tests = to_list_tests @ of_list_tests @ join_tests
 
 let item_tests =
-  edge_tests @ apple_tests @ banana_tests @ broken_clock_tests
-  @ edible_clock_tests @ forgotten_altar_tests @ bloody_altar_tests
-  @ obfuscinator_tests @ jet_pack_tests @ fryingpan_tests
-  @ word_eviscer_inator_tests @ black_cat_tests @ regression_tests
+  EasyTest.edge_tests @ EasyTest.apple_tests @ EasyTest.banana_tests
+  @ EasyTest.broken_clock_tests @ EasyTest.edible_clock_tests
+  @ EasyTest.forgotten_altar_tests @ EasyTest.bloody_altar_tests
+  @ EasyTest.obfuscinator_tests @ EasyTest.jet_pack_tests
+  @ EasyTest.clarity_tests @ EasyTest.fryingpan_tests
+  @ EasyTest.word_eviscer_inator_tests @ EasyTest.black_cat_tests
+  @ EasyTest.regression_tests @ NormalTest.edge_tests @ NormalTest.apple_tests
+  @ NormalTest.banana_tests @ NormalTest.clarity_tests
+  @ NormalTest.broken_clock_tests @ NormalTest.edible_clock_tests
+  @ NormalTest.forgotten_altar_tests @ NormalTest.bloody_altar_tests
+  @ NormalTest.obfuscinator_tests @ NormalTest.jet_pack_tests
+  @ NormalTest.fryingpan_tests @ NormalTest.word_eviscer_inator_tests
+  @ NormalTest.black_cat_tests @ NormalTest.regression_tests
+  @ HardTest.edge_tests @ HardTest.apple_tests @ HardTest.banana_tests
+  @ HardTest.clarity_tests @ HardTest.broken_clock_tests
+  @ HardTest.edible_clock_tests @ HardTest.forgotten_altar_tests
+  @ HardTest.bloody_altar_tests @ HardTest.obfuscinator_tests
+  @ HardTest.jet_pack_tests @ HardTest.fryingpan_tests
+  @ HardTest.word_eviscer_inator_tests @ HardTest.black_cat_tests
+  @ HardTest.regression_tests @ ExtremeTest.edge_tests @ ExtremeTest.apple_tests
+  @ ExtremeTest.banana_tests @ ExtremeTest.clarity_tests
+  @ ExtremeTest.broken_clock_tests @ ExtremeTest.edible_clock_tests
+  @ ExtremeTest.forgotten_altar_tests @ ExtremeTest.bloody_altar_tests
+  @ ExtremeTest.obfuscinator_tests @ ExtremeTest.jet_pack_tests
+  @ ExtremeTest.fryingpan_tests @ ExtremeTest.word_eviscer_inator_tests
+  @ ExtremeTest.black_cat_tests @ ExtremeTest.regression_tests
+  @ SuddenDeathTest.edge_tests @ SuddenDeathTest.apple_tests
+  @ SuddenDeathTest.banana_tests @ SuddenDeathTest.broken_clock_tests
+  @ SuddenDeathTest.clarity_tests @ SuddenDeathTest.edible_clock_tests
+  @ SuddenDeathTest.forgotten_altar_tests @ SuddenDeathTest.bloody_altar_tests
+  @ SuddenDeathTest.obfuscinator_tests @ SuddenDeathTest.jet_pack_tests
+  @ SuddenDeathTest.fryingpan_tests @ SuddenDeathTest.word_eviscer_inator_tests
+  @ SuddenDeathTest.black_cat_tests @ SuddenDeathTest.regression_tests
 
 let tests = "test suite" >::: word_tests @ item_tests
 let () = run_test_tt_main tests

@@ -284,27 +284,27 @@ let obfuscinator_effect () mode =
   | "Easy" ->
       let tmp = EasyGameMutable.time () in
       EasyGameMutable._time := EasyGameMutable.health ();
-      EasyGameMutable._health := min tmp 100
+      EasyGameMutable._health := min tmp (EasyGameMutable.max_health ())
   | "Normal" ->
       let tmp = NormalGameMutable.time () in
       NormalGameMutable._time := NormalGameMutable.health ();
-      NormalGameMutable._health := min tmp 100
+      NormalGameMutable._health := min tmp (NormalGameMutable.max_health ())
   | "Hard" ->
       let tmp = HardGameMutable.time () in
       HardGameMutable._time := HardGameMutable.health ();
-      HardGameMutable._health := min tmp 100
+      HardGameMutable._health := min tmp (HardGameMutable.max_health ())
   | "Extreme" ->
       let tmp = ExtremeGameMutable.time () in
       ExtremeGameMutable._time := ExtremeGameMutable.health ();
-      ExtremeGameMutable._health := min tmp 50
+      ExtremeGameMutable._health := min tmp (ExtremeGameMutable.max_health ())
   | "Sudden Death" ->
       let tmp = SuddenDeathMutable.time () in
       SuddenDeathMutable._time := SuddenDeathMutable.health ();
-      SuddenDeathMutable._health := min tmp 100
+      SuddenDeathMutable._health := min tmp (SuddenDeathMutable.max_health ())
   | "Chaos" ->
       let tmp = ChaosGameMutable.time () in
       ChaosGameMutable._time := ChaosGameMutable.health ();
-      ChaosGameMutable._health := min tmp 150
+      ChaosGameMutable._health := min tmp (ChaosGameMutable.max_health ())
   | _ -> failwith "Invalid game mode"
 
 let obfuscinator : item =
@@ -495,49 +495,49 @@ let regression_stone_effect () (mode : string) =
   match mode with
   | "Easy" ->
       let tmp = EasyGameMutable.cur_level () in
-      EasyGameMutable._cur_level := EasyGameMutable.cur_level () / 2;
+      let cringe = EasyGameMutable.cur_level () / 2 in
       let i = ref 1 in
-      while !i < tmp - EasyGameMutable.cur_level () do
+      while !i <= tmp - cringe do
         EasyGameMutable.decrement_level ();
         i := !i + 1
       done
   | "Normal" ->
       let tmp = NormalGameMutable.cur_level () in
-      NormalGameMutable._cur_level := NormalGameMutable.cur_level () / 2;
+      let cringe = NormalGameMutable.cur_level () / 2 in
       let i = ref 1 in
-      while !i < tmp - NormalGameMutable.cur_level () do
+      while !i <= tmp - cringe do
         NormalGameMutable.decrement_level ();
         i := !i + 1
       done
   | "Hard" ->
       let tmp = HardGameMutable.cur_level () in
-      HardGameMutable._cur_level := HardGameMutable.cur_level () / 2;
+      let cringe = HardGameMutable.cur_level () / 2 in
       let i = ref 1 in
-      while !i < tmp - HardGameMutable.cur_level () do
+      while !i <= tmp - cringe do
         HardGameMutable.decrement_level ();
         i := !i + 1
       done
   | "Extreme" ->
       let tmp = ExtremeGameMutable.cur_level () in
-      ExtremeGameMutable._cur_level := ExtremeGameMutable.cur_level () / 2;
+      let cringe = ExtremeGameMutable.cur_level () / 2 in
       let i = ref 1 in
-      while !i < tmp - ExtremeGameMutable.cur_level () do
+      while !i <= tmp - cringe do
         ExtremeGameMutable.decrement_level ();
         i := !i + 1
       done
   | "Sudden Death" ->
       let tmp = SuddenDeathMutable.cur_level () in
-      SuddenDeathMutable._cur_level := SuddenDeathMutable.cur_level () / 2;
+      let cringe = SuddenDeathMutable.cur_level () / 2 in
       let i = ref 1 in
-      while !i < tmp - SuddenDeathMutable.cur_level () do
+      while !i <= tmp - cringe do
         SuddenDeathMutable.decrement_level ();
         i := !i + 1
       done
   | "Chaos" ->
       let tmp = ChaosGameMutable.cur_level () in
-      ChaosGameMutable._cur_level := ChaosGameMutable.cur_level () / 2;
+      let cringe = ChaosGameMutable.cur_level () / 2 in
       let i = ref 1 in
-      while !i < tmp - ChaosGameMutable.cur_level () do
+      while !i <= tmp - cringe do
         ChaosGameMutable.decrement_level ();
         i := !i + 1
       done
@@ -553,7 +553,7 @@ let regression_stone : item =
 
 let wizards_wand_effect () mode =
   Random.self_init ();
-  let rand_int = (Random.int 20) + 1 in
+  let rand_int = Random.int 20 + 1 in
   match mode with
   | "Easy" ->
       EasyGameMutable._health :=
@@ -598,14 +598,13 @@ let wizards_wand : item =
 let crystal_of_clarity_effect () mode =
   match mode with
   | "Easy" -> EasyGameMutable._time := max (EasyGameMutable.time () - 5) 1
-  | "Normal" ->
-      NormalGameMutable._health := max (NormalGameMutable.time () - 5) 1
-  | "Hard" -> HardGameMutable._health := max (HardGameMutable.time () - 5) 1
+  | "Normal" -> NormalGameMutable._time := max (NormalGameMutable.time () - 5) 1
+  | "Hard" -> HardGameMutable._time := max (HardGameMutable.time () - 5) 1
   | "Extreme" ->
-      ExtremeGameMutable._health := max (ExtremeGameMutable.time () - 5) 1
+      ExtremeGameMutable._time := max (ExtremeGameMutable.time () - 5) 1
   | "Sudden Death" ->
-      SuddenDeathMutable._health := max (SuddenDeathMutable.time () - 5) 1
-  | "Chaos" -> ChaosGameMutable._health := max (ChaosGameMutable.time () - 5) 1
+      SuddenDeathMutable._time := max (SuddenDeathMutable.time () - 5) 1
+  | "Chaos" -> ChaosGameMutable._time := max (ChaosGameMutable.time () - 5) 1
   | _ -> failwith "Invalid game mode"
 
 let crystal_of_clarity : item =
