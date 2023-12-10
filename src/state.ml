@@ -94,7 +94,7 @@ module NormalGameMutable : GameStateMutable = struct
     _time := max 10 (!_time - 5)
 
   let decrement_level () =
-    _cur_level := !_cur_level - 1;
+    _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 5);
     _time := !_time + 5
 
@@ -142,7 +142,7 @@ module EasyGameMutable : GameStateMutable = struct
     _time := !_time
 
   let decrement_level () =
-    _cur_level := !_cur_level - 1;
+    _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 5);
     _time := !_time
 
@@ -192,7 +192,7 @@ module HardGameMutable : GameStateMutable = struct
     _time := max 10 (!_time - 10)
 
   let decrement_level () =
-    _cur_level := !_cur_level - 1;
+    _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 5);
     _time := !_time + 10
 
@@ -242,7 +242,7 @@ module ExtremeGameMutable : GameStateMutable = struct
     _time := max 10 (!_time - 10)
 
   let decrement_level () =
-    _cur_level := !_cur_level - 1;
+    _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 10);
     _time := !_time + 10
 
@@ -296,7 +296,7 @@ module SuddenDeathMutable : GameStateMutable = struct
     _time := max 10 (!_time - 10)
 
   let decrement_level () =
-    _cur_level := !_cur_level - 1;
+    _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 5);
     _time := !_time + 10
 
@@ -354,7 +354,7 @@ module ChaosGameMutable : GameStateMutable = struct
     _time := Random.int 60 + 15
 
   let decrement_level () =
-    _cur_level := !_cur_level - 1;
+    _cur_level := max (!_cur_level - 1) 0;
     _num_words := Random.int 120 + 60;
     _time := Random.int 60 + 15
 

@@ -319,22 +319,22 @@ let obfuscinator : item =
 let jetpack_effect () mode =
   match mode with
   | "Easy" ->
-      EasyGameMutable._health := EasyGameMutable.health () - 10;
+      EasyGameMutable._health := max (EasyGameMutable.health () - 10) 0;
       EasyGameMutable.adjust_level ()
   | "Normal" ->
-      NormalGameMutable._health := NormalGameMutable.health () - 10;
+      NormalGameMutable._health := max (NormalGameMutable.health () - 10) 0;
       NormalGameMutable.adjust_level ()
   | "Hard" ->
-      HardGameMutable._health := HardGameMutable.health () - 10;
+      HardGameMutable._health := max (HardGameMutable.health () - 10) 0;
       HardGameMutable.adjust_level ()
   | "Extreme" ->
-      ExtremeGameMutable._health := ExtremeGameMutable.health () - 10;
+      ExtremeGameMutable._health := max (ExtremeGameMutable.health () - 10) 0;
       ExtremeGameMutable.adjust_level ()
   | "Sudden Death" ->
-      SuddenDeathMutable._health := SuddenDeathMutable.health () - 10;
+      SuddenDeathMutable._health := max (SuddenDeathMutable.health () - 10) 0;
       SuddenDeathMutable.adjust_level ()
   | "Chaos" ->
-      ChaosGameMutable._health := ChaosGameMutable.health () - 10;
+      ChaosGameMutable._health := max (ChaosGameMutable.health () - 10) 0;
       ChaosGameMutable.adjust_level ()
   | _ -> failwith "Invalid game mode"
 
@@ -349,22 +349,22 @@ let jetpack : item =
 let reverse_jetpack_effect () mode =
   match mode with
   | "Easy" ->
-      EasyGameMutable._health := EasyGameMutable.health () - 10;
+      EasyGameMutable._health := max (EasyGameMutable.health () - 10) 0;
       EasyGameMutable.decrement_level ()
   | "Normal" ->
-      NormalGameMutable._health := NormalGameMutable.health () - 10;
+      NormalGameMutable._health := max (NormalGameMutable.health () - 10) 0;
       NormalGameMutable.decrement_level ()
   | "Hard" ->
-      HardGameMutable._health := HardGameMutable.health () - 10;
+      HardGameMutable._health := max (HardGameMutable.health () - 10) 0;
       HardGameMutable.decrement_level ()
   | "Extreme" ->
-      ExtremeGameMutable._health := ExtremeGameMutable.health () - 10;
+      ExtremeGameMutable._health := max (ExtremeGameMutable.health () - 10) 0;
       ExtremeGameMutable.decrement_level ()
   | "Sudden Death" ->
-      SuddenDeathMutable._health := SuddenDeathMutable.health () - 10;
+      SuddenDeathMutable._health := max (SuddenDeathMutable.health () - 10) 0;
       SuddenDeathMutable.decrement_level ()
   | "Chaos" ->
-      ChaosGameMutable._health := ChaosGameMutable.health () - 10;
+      ChaosGameMutable._health := max (ChaosGameMutable.health () - 10) 0;
       ChaosGameMutable.decrement_level ()
   | _ -> failwith "Invalid game mode"
 
@@ -446,23 +446,41 @@ let word_eviscer_inator : item =
 let black_cat_trinket_effect () mode =
   match mode with
   | "Easy" ->
-      EasyGameMutable._health :=
+      let new_health =
         max 1 (EasyGameMutable.max_health () - EasyGameMutable.health ())
+      in
+      EasyGameMutable._max_health := new_health;
+      EasyGameMutable._health := new_health
   | "Normal" ->
-      NormalGameMutable._health :=
+      let new_health =
         max 1 (NormalGameMutable.max_health () - NormalGameMutable.health ())
+      in
+      NormalGameMutable._max_health := new_health;
+      NormalGameMutable._health := new_health
   | "Hard" ->
-      HardGameMutable._health :=
+      let new_health =
         max 1 (HardGameMutable.max_health () - HardGameMutable.health ())
+      in
+      HardGameMutable._max_health := new_health;
+      HardGameMutable._health := new_health
   | "Extreme" ->
-      ExtremeGameMutable._health :=
+      let new_health =
         max 1 (ExtremeGameMutable.max_health () - ExtremeGameMutable.health ())
+      in
+      ExtremeGameMutable._max_health := new_health;
+      ExtremeGameMutable._health := new_health
   | "Sudden Death" ->
-      SuddenDeathMutable._health :=
+      let new_health =
         max 1 (SuddenDeathMutable.max_health () - SuddenDeathMutable.health ())
+      in
+      SuddenDeathMutable._max_health := new_health;
+      SuddenDeathMutable._health := new_health
   | "Chaos" ->
-      ChaosGameMutable._health :=
+      let new_health =
         max 1 (ChaosGameMutable.max_health () - ChaosGameMutable.health ())
+      in
+      ChaosGameMutable._max_health := new_health;
+      ChaosGameMutable._health := new_health
   | _ -> failwith "Invalid game mode"
 
 let black_cat_trinket : item =
