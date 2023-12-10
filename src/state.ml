@@ -91,11 +91,13 @@ module NormalGameMutable : GameStateMutable = struct
   let adjust_level () =
     _cur_level := !_cur_level + 1;
     _num_words := !_num_words + 5;
+    _difficulty := !_difficulty + 1;
     _time := max 10 (!_time - 5)
 
   let decrement_level () =
     _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 5);
+    _difficulty := !_difficulty - 1;
     _time := !_time + 5
 
   let add_score correct =
@@ -139,11 +141,13 @@ module EasyGameMutable : GameStateMutable = struct
   let adjust_level () =
     _cur_level := !_cur_level + 1;
     _num_words := !_num_words + 5;
+    _difficulty := !_difficulty + 1;
     _time := !_time
 
   let decrement_level () =
     _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 5);
+    _difficulty := !_difficulty - 1;
     _time := !_time
 
   let add_score correct =
@@ -189,11 +193,13 @@ module HardGameMutable : GameStateMutable = struct
   let adjust_level () =
     _cur_level := !_cur_level + 1;
     _num_words := !_num_words + 5;
+    _difficulty := !_difficulty + 1;
     _time := max 10 (!_time - 10)
 
   let decrement_level () =
     _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 5);
+    _difficulty := !_difficulty - 1;
     _time := !_time + 10
 
   let add_score correct =
@@ -239,12 +245,14 @@ module ExtremeGameMutable : GameStateMutable = struct
   let adjust_level () =
     _cur_level := !_cur_level + 1;
     _num_words := !_num_words + 10;
-    _time := max 10 (!_time - 10)
+    _time := max 10 (!_time - 10);
+    _difficulty := !_difficulty + 1
 
   let decrement_level () =
     _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 10);
-    _time := !_time + 10
+    _time := !_time + 10;
+    _difficulty := !_difficulty - 1
 
   let add_score correct =
     _score := !_score + (correct * 10);
@@ -293,11 +301,13 @@ module SuddenDeathMutable : GameStateMutable = struct
   let adjust_level () =
     _cur_level := !_cur_level + 1;
     _num_words := !_num_words + 5;
+    _difficulty := !_difficulty + 1;
     _time := max 10 (!_time - 10)
 
   let decrement_level () =
     _cur_level := max (!_cur_level - 1) 0;
     _num_words := max 10 (!_num_words - 5);
+    _difficulty := !_difficulty - 1;
     _time := !_time + 10
 
   let add_score correct =
@@ -351,11 +361,13 @@ module ChaosGameMutable : GameStateMutable = struct
     _num_words := Random.int 120 + 60;
     _max_health := Random.int 100 + 50;
     _health := min !_max_health !_health;
+    _difficulty := !_difficulty + 1;
     _time := Random.int 60 + 15
 
   let decrement_level () =
     _cur_level := max (!_cur_level - 1) 0;
     _num_words := Random.int 120 + 60;
+    _difficulty := !_difficulty - 1;
     _time := Random.int 60 + 15
 
   let add_score correct =
